@@ -291,12 +291,15 @@ export default function Snake() {
           <div className="modal">
             <h2>بازی تمام شد!</h2>
             <p>امتیاز نهایی: {score.toLocaleString("fa-IR")}</p>
-            {result && (
+             {result && (
               <>
                 <p>🪙 سکه‌های دریافتی: {result.coinsEarned}</p>
                 {result.flagsEarned > 0 && <p>🚩 پرچم‌های دریافتی: {result.flagsEarned}</p>}
                 {result.isNewRecord && <p className="record-text">🎉 رکورد جدید!</p>}
               </>
+            )}
+             {score > 0 && !result && (
+              <p style={{ color: "#e17055" }}>⚠️ امتیاز ذخیره نشد. در consول مرورگر خطا را بررسی کنید.</p>
             )}
             <button onClick={startGame} className="btn-primary">دوباره</button>
             <button onClick={() => navigate("/dashboard")} className="btn-secondary">داشبورد</button>
