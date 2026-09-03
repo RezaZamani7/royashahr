@@ -228,10 +228,16 @@ export default function DinoGame() {
     }
     if (action === "jump") {
       jump();
-    } else if (action === "duck") {
+    } else if (action === "duck_start") {
       setDuck(true);
     }
   }, [jump, setDuck, startGame, showResult]);
+
+  const handleTouchActionEnd = useCallback((action) => {
+    if (action === "duck_start") {
+      setDuck(false);
+    }
+  }, [setDuck]);
 
   const handleTouchEnd = useCallback(() => {
     setDuck(false);
@@ -318,11 +324,7 @@ export default function DinoGame() {
       game.frame++;
 
       const dino = game.dino;
-      if (game.ducking) {
-        dino.vy += GRAVITY * 0.5;
-      } else {
-        dino.vy += GRAVITY;
-      }
+      dino.vy += GRAVITY;
       dino.y += dino.vy;
       if (dino.y > GROUND_Y - DINO_H) {
         dino.y = GROUND_Y - DINO_H;
@@ -431,6 +433,7 @@ export default function DinoGame() {
       <TouchControls
         type="dino"
         onAction={handleTouchAction}
+        onActionEnd={handleTouchActionEnd}
         gameOver={gameOver}
         onRestart={startGame}
       />

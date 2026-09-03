@@ -228,8 +228,8 @@ export default function Tetris() {
 
   useEffect(() => {
     const handler = (e) => {
-      if (e.key === "ArrowLeft") { e.preventDefault(); moveLR(1); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); moveLR(-1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); moveLR(-1); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); moveLR(1); }
       else if (e.key === "ArrowDown") { e.preventDefault(); moveDown(); }
       else if (e.key === "ArrowUp") { e.preventDefault(); rotate(); }
       else if (e.key === " ") { e.preventDefault(); hardDrop(); }
@@ -247,8 +247,8 @@ export default function Tetris() {
 
   const handleTouchDirection = useCallback((dir) => {
     if (gameOverRef.current || pausedRef.current) return;
-    if (dir === "left") moveLR(1);
-    else if (dir === "right") moveLR(-1);
+    if (dir === "left") moveLR(-1);
+    else if (dir === "right") moveLR(1);
   }, [moveLR]);
 
   const handleTouchAction = useCallback((action) => {
@@ -306,8 +306,8 @@ export default function Tetris() {
         <div className="tetris-side">
           <div className="tetris-controls">
             <p>🎮 راهنمای کنترل:</p>
-            <p>→ : حرکت به چپ</p>
-            <p>← : حرکت به راست</p>
+            <p>← : حرکت به چپ</p>
+            <p>→ : حرکت به راست</p>
             <p>↑ : چرخش</p>
             <p>↓ : پایین آوردن</p>
             <p>Space : رها کردن سریع</p>
@@ -317,6 +317,14 @@ export default function Tetris() {
           {paused && <div className="tetris-paused">متوقف شد</div>}
         </div>
       </div>
+
+      <TouchControls
+        type="tetris"
+        onDirection={handleTouchDirection}
+        onAction={handleTouchAction}
+        gameOver={gameOver}
+        onRestart={startGame}
+      />
 
       {showResult && (
         <div className="modal-overlay">
@@ -333,16 +341,8 @@ export default function Tetris() {
             <button onClick={startGame} className="btn-primary">دوباره</button>
             <button onClick={() => navigate("/dashboard")} className="btn-secondary">داشبورد</button>
           </div>
-        </div>
+         </div>
       )}
-
-      <TouchControls
-        type="tetris"
-        onDirection={handleTouchDirection}
-        onAction={handleTouchAction}
-        gameOver={gameOver}
-        onRestart={startGame}
-      />
     </div>
   );
 }

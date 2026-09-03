@@ -175,7 +175,7 @@ export default function Game2048() {
 
   useEffect(() => {
     const handler = (e) => {
-      const keyMap = { ArrowLeft: "right", ArrowRight: "left", ArrowUp: "up", ArrowDown: "down" };
+      const keyMap = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "up", ArrowDown: "down" };
       if (keyMap[e.key]) {
         e.preventDefault();
         move(keyMap[e.key]);

@@ -302,6 +302,14 @@ export default function Snake() {
         </div>
       </div>
 
+      <TouchControls
+        type="snake"
+        onDirection={handleTouchDirection}
+        onAction={handleTouchAction}
+        gameOver={gameOver}
+        onRestart={startGame}
+      />
+
       {paused && !gameOver && (
         <div className="snake-overlay-text">متوقف شد - Space را بزنید</div>
       )}
@@ -326,14 +334,6 @@ export default function Snake() {
           </div>
         </div>
       )}
-
-      <TouchControls
-        type="snake"
-        onDirection={handleTouchDirection}
-        onAction={handleTouchAction}
-        gameOver={gameOver}
-        onRestart={startGame}
-      />
     </div>
   );
 }

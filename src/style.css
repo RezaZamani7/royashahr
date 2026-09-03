@@ -885,11 +885,22 @@ body {
 .touch-controls {
   display: none;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 0;
   padding: 16px;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+/* Show touch controls on all non-desktop devices (touch-only) */
+@media (hover: none) {
+  .touch-controls {
+    display: flex;
+  }
+}
+
+/* Also show on small screens up to tablet size */
+@media (max-width: 1200px) {
   .touch-controls {
     display: flex;
   }

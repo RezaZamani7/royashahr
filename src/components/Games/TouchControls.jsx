@@ -22,7 +22,15 @@ export function Dpad({ onDirection, size = "normal" }) {
   );
 }
 
-export default function TouchControls({ type, onDirection, onAction, gameOver, onRestart }) {
+export default function TouchControls({ type, onDirection, onAction, onActionEnd, gameOver, onRestart }) {
+  const handlePressStart = (action) => {
+    if (onAction) onAction(action);
+  };
+
+  const handlePressEnd = (action) => {
+    if (onActionEnd) onActionEnd(action);
+  };
+
   if (gameOver && type === "snake") {
     return (
       <div className="touch-controls">
@@ -52,7 +60,7 @@ export default function TouchControls({ type, onDirection, onAction, gameOver, o
       return (
         <div className="touch-controls snake-touch-controls">
           <Dpad onDirection={onDirection} />
-          <button className="action-btn snake-action-btn" onClick={() => onAction("pause")}>
+          <button className="action-btn snake-action-btn" onClick={() => handlePressStart("pause")}>
             ⏸️
           </button>
         </div>
@@ -61,10 +69,16 @@ export default function TouchControls({ type, onDirection, onAction, gameOver, o
     case "dino":
       return (
         <div className="touch-controls dino-touch-controls">
-          <button className="action-btn dino-btn jump" onClick={() => onAction("jump")}>
+          <button className="action-btn dino-btn jump" onClick={() => handlePressStart("jump")}>
             پرش
           </button>
-          <button className="action-btn dino-btn duck" onClick={() => onAction("duck")}>
+          <button
+            className="action-btn dino-btn duck"
+            onMouseDown={() => handlePressStart("duck_start")}
+            onMouseUp={() => handlePressEnd("duck_start")}
+            onTouchStart={(e) => { e.preventDefault(); handlePressStart("duck_start"); }}
+            onTouchEnd={(e) => { e.preventDefault(); handlePressEnd("duck_start"); }}
+          >
             خم شدن
           </button>
         </div>
@@ -74,10 +88,10 @@ export default function TouchControls({ type, onDirection, onAction, gameOver, o
       return (
         <div className="touch-controls tetris-touch-controls">
           <Dpad onDirection={onDirection} size="small" />
-          <button className="action-btn rotate" onClick={() => onAction("rotate")}>
+          <button className="action-btn rotate" onClick={() => handlePressStart("rotate")}>
             ↻
           </button>
-          <button className="action-btn drop" onClick={() => onAction("drop")}>
+          <button className="action-btn drop" onClick={() => handlePressStart("drop")}>
             ⬇
           </button>
         </div>
