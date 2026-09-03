@@ -19,21 +19,26 @@ CREATE TABLE IF NOT EXISTS users (
 -- فعال کردن RLS (Row Level Security)
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- سیاست: کاربران می‌توانند داده‌های خود را بخوانند
-CREATE POLICY "Users can read own data" ON users
-  FOR SELECT USING (auth.uid() = id);
+-- سیاست (Policy) - فقط در صورت عدم وجود ایجاد می‌شوند
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'users' AND policyname = 'Users can read own data') THEN
+    CREATE POLICY "Users can read own data" ON users FOR SELECT USING (auth.uid() = id);
+  END IF;
 
--- سیاست: کاربران می‌توانند داده‌های خود را به‌روز کنند
-CREATE POLICY "Users can update own data" ON users
-  FOR UPDATE USING (auth.uid() = id);
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'users' AND policyname = 'Users can update own data') THEN
+    CREATE POLICY "Users can update own data" ON users FOR UPDATE USING (auth.uid() = id);
+  END IF;
 
--- سیاست: کاربران می‌توانند داده‌های خود را وارد کنند
-CREATE POLICY "Users can insert own data" ON users
-  FOR INSERT WITH CHECK (auth.uid() = id);
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'users' AND policyname = 'Users can insert own data') THEN
+    CREATE POLICY "Users can insert own data" ON users FOR INSERT WITH CHECK (auth.uid() = id);
+  END IF;
 
--- سیاست: همه می‌توانند برای رتبه‌بندی داده‌ها را بخوانند
-CREATE POLICY "Anyone can read leaderboard" ON users
-  FOR SELECT USING (true);
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'users' AND policyname = 'Anyone can read leaderboard') THEN
+    CREATE POLICY "Anyone can read leaderboard" ON users FOR SELECT USING (true);
+  END IF;
+END;
+$$;
 
 -- ایندکس برای مرتب‌سازی بر اساس امتیاز
 CREATE INDEX IF NOT EXISTS idx_users_total_score ON users(total_score DESC);
