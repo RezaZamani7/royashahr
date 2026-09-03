@@ -12,38 +12,66 @@ export function GameProvider({ children }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState(null);
 
+  const ensureProfile = async () => {
+    if (!user) return null;
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", user.uid)
+      .maybeSingle();
+
+    if (data) {
+      const safe = {
+        total_score: data.total_score ?? 0,
+        coins: data.coins ?? 0,
+        flags: data.flags ?? 0,
+        high_2048: data.high_2048 ?? 0,
+        high_tetris: data.high_tetris ?? 0,
+        high_dino: data.high_dino ?? 0,
+        high_snake: data.high_snake ?? 0,
+      };
+      setProfile({ ...data, ...safe });
+      return { ...data, ...safe };
+    }
+
+    if (error) {
+      console.error("[ensureProfile] SELECT error:", error);
+    }
+
+    const newProfile = {
+      id: user.uid,
+      username: user.email?.split("@")[0] ?? "user",
+      email: user.email ?? "",
+      total_score: 0,
+      coins: 0,
+      flags: 0,
+      high_2048: 0,
+      high_tetris: 0,
+      high_dino: 0,
+      high_snake: 0,
+    };
+    const { data: inserted, error: insertErr } = await supabase
+      .from("users")
+      .insert(newProfile)
+      .select()
+      .single();
+
+    if (insertErr) {
+      console.error("[ensureProfile] INSERT error:", insertErr);
+      return null;
+    }
+    setProfile(inserted);
+    return inserted;
+  };
+
   useEffect(() => {
     if (user) {
-      loadProfile();
+      ensureProfile();
     } else {
       setProfile(null);
     }
   }, [user]);
-
-  const loadProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.uid)
-        .maybeSingle();
-
-      if (data) {
-        const safe = {
-          total_score: data.total_score ?? 0,
-          coins: data.coins ?? 0,
-          flags: data.flags ?? 0,
-          high_2048: data.high_2048 ?? 0,
-          high_tetris: data.high_tetris ?? 0,
-          high_dino: data.high_dino ?? 0,
-          high_snake: data.high_snake ?? 0,
-        };
-        setProfile({ ...data, ...safe });
-      }
-    } catch (err) {
-      console.error("[loadProfile] error:", err);
-    }
-  };
 
   const updateUsername = async (newName) => {
     if (!user || !profile) return;
@@ -59,39 +87,57 @@ export function GameProvider({ children }) {
   };
 
   const submitScore = async (game, score) => {
-    if (!user) return null;
-
-    const field = GAME_FIELD[game];
-    console.log("[submitScore]", { game, field, score, userId: user.uid, userEmail: user.email });
-
-    const { data, error } = await supabase.rpc("upsert_user_score", {
-      p_user_id: user.uid,
-      p_user_email: user.email || "",
-      p_game_field: field,
-      p_score: score,
-    });
-
-    console.log("[submitScore] RPC result:", { data, error });
-
-    if (error) {
-      console.error("[submitScore] RPC error:", error);
+    if (!user) {
       return null;
     }
 
-    if (data) {
-      setProfile((prev) => ({
-        ...prev,
-        total_score: (prev?.total_score ?? 0) + score,
-        coins: (prev?.coins ?? 0) + (data.coinsEarned ?? 0),
-        flags: (prev?.flags ?? 0) + (data.flagsEarned ?? 0),
-        [field]: data.newHigh,
-      }));
+    const field = GAME_FIELD[game];
+
+    const freshProfile = await ensureProfile();
+    if (!freshProfile) {
+      return null;
     }
 
-    return data;
+    const oldHigh = freshProfile[field] || 0;
+    const newHigh = Math.max(oldHigh, score);
+    const isNewRecord = score > oldHigh;
+
+    const coinsEarned = Math.floor(score / 100);
+    let flagsEarned = 0;
+    if (isNewRecord) {
+      const diff = score - oldHigh;
+      flagsEarned = Math.floor(diff / 100);
+    }
+
+    const updates = {
+      total_score: (freshProfile.total_score || 0) + score,
+      coins: (freshProfile.coins || 0) + coinsEarned,
+      flags: (freshProfile.flags || 0) + flagsEarned,
+      [field]: newHigh,
+    };
+
+    const { error } = await supabase
+      .from("users")
+      .update(updates)
+      .eq("id", user.uid);
+
+    if (error) {
+      console.error("[submitScore] UPDATE error:", { error, field, score, userId: user.uid });
+      return null;
+    }
+
+    setProfile((prev) => ({
+      ...prev,
+      total_score: updates.total_score,
+      coins: updates.coins,
+      flags: updates.flags,
+      [field]: newHigh,
+    }));
+
+    return { coinsEarned, flagsEarned, isNewRecord, newHigh };
   };
 
-  const value = { profile, loadProfile, submitScore, updateUsername };
+  const value = { profile, loadProfile: ensureProfile, submitScore, updateUsername };
   return (
     <GameContext.Provider value={value}>
       {children}
