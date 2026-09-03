@@ -34,42 +34,11 @@ export function GameProvider({ children }) {
           coins: data.coins ?? 0,
           flags: data.flags ?? 0,
           high_2048: data.high_2048 ?? 0,
-          high_tetris: data.tetris ?? 0,
+          high_tetris: data.high_tetris ?? 0,
           high_dino: data.high_dino ?? 0,
           high_snake: data.high_snake ?? 0,
         };
         setProfile({ ...data, ...safe });
-      } else {
-        const newProfile = {
-          id: user.uid,
-          username: user.email.split("@")[0],
-          email: user.email,
-          total_score: 0,
-          coins: 0,
-          flags: 0,
-          high_2048: 0,
-          high_tetris: 0,
-          high_dino: 0,
-          high_snake: 0,
-        };
-        const { data: inserted, error: insertError } = await supabase
-          .from("users")
-          .insert(newProfile)
-          .select()
-          .single();
-
-        if (insertError) {
-          console.error("[loadProfile] INSERT failed:", insertError.message);
-          // retry: maybe another tab created it
-          const { data: retry } = await supabase
-            .from("users")
-            .select("*")
-            .eq("id", user.uid)
-            .maybeSingle();
-          if (retry) setProfile(retry);
-        } else if (inserted) {
-          setProfile(inserted);
-        }
       }
     } catch (err) {
       console.error("[loadProfile] error:", err);
@@ -90,115 +59,36 @@ export function GameProvider({ children }) {
   };
 
   const submitScore = async (game, score) => {
-    if (!user) {
-      console.error("[submitScore] No user");
+    if (!user) return null;
+
+    const field = GAME_FIELD[game];
+    console.log("[submitScore]", { game, field, score, userId: user.uid, userEmail: user.email });
+
+    const { data, error } = await supabase.rpc("upsert_user_score", {
+      p_user_id: user.uid,
+      p_user_email: user.email || "",
+      p_game_field: field,
+      p_score: score,
+    });
+
+    console.log("[submitScore] RPC result:", { data, error });
+
+    if (error) {
+      console.error("[submitScore] RPC error:", error);
       return null;
     }
 
-    const field = GAME_FIELD[game];
-    console.log("[submitScore]", { game, field, score, userId: user.uid });
-
-    // Read fresh from DB first
-    const { data: dbProfile, error: readErr } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", user.uid)
-      .maybeSingle();
-
-    console.log("[submitScore] DB read:", { dbProfile, readErr });
-
-    const oldHigh = (dbProfile?.[field]) ?? 0;
-    const newHigh = Math.max(oldHigh, score);
-    const isNewRecord = score > oldHigh;
-
-    const coinsEarned = Math.floor(score / 100);
-    let flagsEarned = 0;
-    if (isNewRecord) {
-      const diff = score - oldHigh;
-      flagsEarned = Math.floor(diff / 100);
+    if (data) {
+      setProfile((prev) => ({
+        ...prev,
+        total_score: (prev?.total_score ?? 0) + score,
+        coins: (prev?.coins ?? 0) + (data.coinsEarned ?? 0),
+        flags: (prev?.flags ?? 0) + (data.flagsEarned ?? 0),
+        [field]: data.newHigh,
+      }));
     }
 
-    const newTotalScore = (dbProfile?.total_score ?? 0) + score;
-    const newCoins = (dbProfile?.coins ?? 0) + coinsEarned;
-    const newFlags = (dbProfile?.flags ?? 0) + flagsEarned;
-
-    if (!dbProfile) {
-      // New user: upsert
-      const { data: upserted, error: upsertErr } = await supabase
-        .from("users")
-        .insert({
-          id: user.uid,
-          username: user.email?.split("@")[0] ?? "user",
-          email: user.email ?? "",
-          total_score: newTotalScore,
-          coins: newCoins,
-          flags: newFlags,
-          high_2048: 0,
-          high_tetris: 0,
-          high_dino: 0,
-          high_snake: 0,
-          [field]: newHigh,
-        })
-        .select()
-        .single();
-
-      if (upsertErr) {
-        console.error("[submitScore] INSERT error:", upsertErr);
-        return null;
-      }
-      setProfile(upserted);
-      console.log("[submitScore] New profile created");
-    } else {
-      // Existing user: update
-      const updates = {
-        total_score: newTotalScore,
-        coins: newCoins,
-        flags: newFlags,
-        [field]: newHigh,
-      };
-      const { data: updated, error: updateErr } = await supabase
-        .from("users")
-        .update(updates)
-        .eq("id", user.uid)
-        .select();
-
-      if (updateErr) {
-        console.error("[submitScore] UPDATE error:", updateErr);
-        return null;
-      }
-      console.log("[submitScore] UPDATE result:", { updated, affectedRows: updated?.length });
-
-      if (!updated || updated.length === 0) {
-        console.error("[submitScore] UPDATE affected 0 rows. Trying upsert instead.");
-        const { data: upserted, error: upsertErr } = await supabase
-          .from("users")
-          .upsert({
-            id: user.uid,
-            username: dbProfile.username,
-            email: dbProfile.email,
-            total_score: newTotalScore,
-            coins: newCoins,
-            flags: newFlags,
-            high_2048: dbProfile.high_2048 ?? 0,
-            high_tetris: dbProfile.high_tetris ?? 0,
-            high_dino: dbProfile.high_dino ?? 0,
-            high_snake: dbProfile.high_snake ?? 0,
-            ...updates,
-          }, { onConflict: "id" })
-          .select()
-          .single();
-
-        if (upsertErr) {
-          console.error("[submitScore] UPSERT error:", upsertErr);
-          return null;
-        }
-        setProfile(upserted);
-      } else {
-        setProfile((prev) => ({ ...prev, ...updates }));
-      }
-    }
-
-    return { coinsEarned, flagsEarned, isNewRecord, newHigh };
+    return data;
   };
 
   const value = { profile, loadProfile, submitScore, updateUsername };
