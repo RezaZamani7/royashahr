@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
+import TouchControls from "./TouchControls";
 
 const CANVAS_W = 800;
 const CANVAS_H = 200;
@@ -220,6 +221,22 @@ export default function DinoGame() {
     }
   }, []);
 
+  const handleTouchAction = useCallback((action) => {
+    if (gameOverRef.current) {
+      if (!showResult) startGame();
+      return;
+    }
+    if (action === "jump") {
+      jump();
+    } else if (action === "duck") {
+      setDuck(true);
+    }
+  }, [jump, setDuck, startGame, showResult]);
+
+  const handleTouchEnd = useCallback(() => {
+    setDuck(false);
+  }, [setDuck]);
+
   useEffect(() => {
     const handler = (e) => {
       if (e.key === " " || e.key === "ArrowUp") {
@@ -409,7 +426,14 @@ export default function DinoGame() {
         />
       </div>
 
-      <div className="swipe-hint">Space یا ↑ برای پرش | ↓ برای خم شدن</div>
+       <div className="swipe-hint">Space یا ↑ برای پرش | ↓ برای خم شدن</div>
+
+      <TouchControls
+        type="dino"
+        onAction={handleTouchAction}
+        gameOver={gameOver}
+        onRestart={startGame}
+      />
 
       {showResult && (
         <div className="modal-overlay">

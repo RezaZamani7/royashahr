@@ -880,3 +880,175 @@ body {
     height: auto;
   }
 }
+
+/* Touch Controls for Mobile */
+.touch-controls {
+  display: none;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 16px;
+}
+
+@media (max-width: 768px) {
+  .touch-controls {
+    display: flex;
+  }
+}
+
+/* D-pad for Snake */
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
+  width: 180px;
+}
+
+.dpad-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dpad-btn:active {
+  background: var(--primary);
+  color: white;
+  transform: scale(0.95);
+}
+
+.dpad-btn.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+  transform: none;
+}
+
+.dpad-btn.dpad-center {
+  background: var(--primary);
+  color: white;
+  font-size: 1.8rem;
+}
+
+.dpad-btn.dpad-center:active {
+  background: var(--primary-dark);
+  transform: scale(0.95);
+}
+
+.dpad-row-center {
+  display: flex;
+  justify-content: center;
+}
+
+/* Action buttons for Snake */
+.action-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-btn:active {
+  background: var(--secondary);
+  color: white;
+  transform: scale(0.95);
+}
+
+.snake-touch-controls {
+  flex-direction: row;
+  align-items: center;
+  gap: 24px;
+}
+
+.snake-touch-controls .dpad {
+  width: 180px;
+}
+
+.snake-action-btn {
+  width: 60px;
+  height: 60px;
+  font-size: 1.3rem;
+}
+
+/* Dino touch controls */
+.dino-touch-controls {
+  flex-direction: row;
+  gap: 16px;
+}
+
+.dino-btn {
+  flex: 1;
+  max-width: 120px;
+  height: 60px;
+  font-size: 1.1rem;
+}
+
+.dino-btn.jump {
+  background: var(--success);
+  color: white;
+}
+
+.dino-btn.duck {
+  background: var(--accent);
+  color: white;
+}
+
+/* Tetris touch controls */
+.tetris-touch-controls {
+  flex-direction: row;
+  gap: 16px;
+  align-items: center;
+}
+
+.tetris-touch-controls .dpad {
+  width: 150px;
+}
+
+.tetris-touch-controls .dpad-btn {
+  width: 46px;
+  height: 46px;
+  font-size: 1.2rem;
+}
+
+.tetris-touch-controls .action-btn {
+  width: 46px;
+  height: 46px;
+  font-size: 1.2rem;
+}
+
+.game2048-touch-controls .dpad {
+  width: 180px;
+  justify-content: center;
+}
+
+.tetris-touch-controls .action-btn.rotate {
+  background: var(--secondary);
+  color: white;
+}
+
+.tetris-touch-controls .action-btn.drop {
+  background: var(--accent);
+  color: white;
+}

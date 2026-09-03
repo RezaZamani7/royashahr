@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
+import TouchControls from "./TouchControls";
 
 const COLS = 25;
 const ROWS = 20;
@@ -82,6 +83,25 @@ export default function Snake() {
     setResult(null);
     setStarted(true);
   }, []);
+
+  const handleTouchDirection = useCallback((dir) => {
+    if (gameOverRef.current || pausedRef.current) return;
+    if (dir === "up" && dirRef.current !== DIR.DOWN) nextDirRef.current = DIR.UP;
+    else if (dir === "down" && dirRef.current !== DIR.UP) nextDirRef.current = DIR.DOWN;
+    else if (dir === "left" && dirRef.current !== DIR.RIGHT) nextDirRef.current = DIR.LEFT;
+    else if (dir === "right" && dirRef.current !== DIR.LEFT) nextDirRef.current = DIR.RIGHT;
+  }, []);
+
+  const handleTouchAction = useCallback((action) => {
+    if (action === "pause") {
+      if (gameOverRef.current) {
+        startGame();
+      } else if (startedRef.current) {
+        pausedRef.current = !pausedRef.current;
+        setPaused(pausedRef.current);
+      }
+    }
+  }, [startGame]);
 
   const handleGameEnd = useCallback(async (finalScore) => {
     if (gameOverRef.current) return;
@@ -286,19 +306,19 @@ export default function Snake() {
         <div className="snake-overlay-text">متوقف شد - Space را بزنید</div>
       )}
 
-      {showResult && (
+       {showResult && (
         <div className="modal-overlay">
           <div className="modal">
             <h2>بازی تمام شد!</h2>
             <p>امتیاز نهایی: {score.toLocaleString("fa-IR")}</p>
-             {result && (
+            {result && (
               <>
                 <p>🪙 سکه‌های دریافتی: {result.coinsEarned}</p>
                 {result.flagsEarned > 0 && <p>🚩 پرچم‌های دریافتی: {result.flagsEarned}</p>}
                 {result.isNewRecord && <p className="record-text">🎉 رکورد جدید!</p>}
               </>
             )}
-             {score > 0 && !result && (
+            {score > 0 && !result && (
               <p style={{ color: "#e17055" }}>⚠️ امتیاز ذخیره نشد. در consول مرورگر خطا را بررسی کنید.</p>
             )}
             <button onClick={startGame} className="btn-primary">دوباره</button>
@@ -306,6 +326,14 @@ export default function Snake() {
           </div>
         </div>
       )}
+
+      <TouchControls
+        type="snake"
+        onDirection={handleTouchDirection}
+        onAction={handleTouchAction}
+        gameOver={gameOver}
+        onRestart={startGame}
+      />
     </div>
   );
 }

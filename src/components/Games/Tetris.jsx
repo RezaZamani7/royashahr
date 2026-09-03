@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
+import TouchControls from "./TouchControls";
 
 const COLS = 10;
 const ROWS = 20;
@@ -244,6 +245,21 @@ export default function Tetris() {
     return () => window.removeEventListener("keydown", handler);
   }, [moveLR, moveDown, rotate, hardDrop]);
 
+  const handleTouchDirection = useCallback((dir) => {
+    if (gameOverRef.current || pausedRef.current) return;
+    if (dir === "left") moveLR(1);
+    else if (dir === "right") moveLR(-1);
+  }, [moveLR]);
+
+  const handleTouchAction = useCallback((action) => {
+    if (gameOverRef.current || pausedRef.current) {
+      if (gameOverRef.current) startGame();
+      return;
+    }
+    if (action === "rotate") rotate();
+    else if (action === "drop") hardDrop();
+  }, [moveLR, moveDown, rotate, hardDrop, startGame]);
+
   function renderBoard() {
     const display = boardRef.current.map((row) => [...row]);
     const p = pieceRef.current;
@@ -319,6 +335,14 @@ export default function Tetris() {
           </div>
         </div>
       )}
+
+      <TouchControls
+        type="tetris"
+        onDirection={handleTouchDirection}
+        onAction={handleTouchAction}
+        gameOver={gameOver}
+        onRestart={startGame}
+      />
     </div>
   );
 }

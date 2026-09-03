@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
+import TouchControls from "./TouchControls";
 
 const SIZE = 4;
 
@@ -201,8 +202,16 @@ export default function Game2048() {
     } else {
       move(dy > 0 ? "down" : "up");
     }
-    touchStartRef.current = null;
+     touchStartRef.current = null;
   };
+
+  const handleTouchDirection = useCallback((dir) => {
+    if (gameOverRef.current) return;
+    if (dir === "left") move("left");
+    else if (dir === "right") move("right");
+    else if (dir === "up") move("up");
+    else if (dir === "down") move("down");
+  }, [move]);
 
   const restart = () => {
     const newGrid = addRandom(addRandom(createEmptyGrid()));
@@ -258,6 +267,13 @@ export default function Game2048() {
       </div>
 
       <div className="swipe-hint">از کلیدهای جهت‌دار یا کشیدن انگشت استفاده کنید</div>
+
+      <TouchControls
+        type="game2048"
+        onDirection={handleTouchDirection}
+        gameOver={gameOver}
+        onRestart={restart}
+      />
 
       {showWon && (
         <div className="modal-overlay">
