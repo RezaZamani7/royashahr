@@ -21,29 +21,49 @@ export function GameProvider({ children }) {
   }, [user]);
 
   const loadProfile = async () => {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", user.uid)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", user.uid)
+        .maybeSingle();
 
-    if (data) {
-      setProfile(data);
-    } else if (error && error.code === "PGRST116") {
-      const newProfile = {
-        id: user.uid,
-        username: user.email.split("@")[0],
-        email: user.email,
-        total_score: 0,
-        coins: 0,
-        flags: 0,
-        high_2048: 0,
-        high_tetris: 0,
-        high_dino: 0,
-        high_snake: 0,
-      };
-      const { data: inserted } = await supabase.from("users").insert(newProfile).select().single();
-      if (inserted) setProfile(inserted);
+      if (data) {
+
+        const safe = {
+          total_score: data.total_score ?? 0,
+          coins: data.coins ?? 0,
+          flags: data.flags ?? 0,
+          high_2048: data.high_2048 ?? 0,
+          high_tetris: data.high_tetris ?? 0,
+          high_dino: data.high_dino ?? 0,
+          high_snake: data.high_snake ?? 0,
+        };
+        setProfile({ ...data, ...safe });
+      } else {
+        const newProfile = {
+          id: user.uid,
+          username: user.email.split("@")[0],
+          email: user.email,
+          total_score: 0,
+          coins: 0,
+          flags: 0,
+          high_2048: 0,
+          high_tetris: 0,
+          high_dino: 0,
+          high_snake: 0,
+        };
+        const { data: inserted, error: insertError } = await supabase.from("users").insert(newProfile).select().maybeSingle();
+        if (insertError) {
+          // maybe another tab already created it
+          const { data: retry } = await supabase.from("users").select("*").eq("id", user.uid).maybeSingle();
+          if (retry) setProfile(retry);
+        } else if (inserted) {
+          setProfile(inserted);
+        }
+      }
+    } catch (err) {
+      console.error("loadProfile error", err);
     }
   };
 
@@ -86,7 +106,10 @@ export function GameProvider({ children }) {
       [field]: newHigh,
     };
 
-    await supabase.from("users").update(updates).eq("id", user.uid);
+    const { error } = await supabase.from("users").update(updates).eq("id", user.uid);
+    if (error) {
+      return null;
+    }
 
     setProfile((prev) => ({
       ...prev,

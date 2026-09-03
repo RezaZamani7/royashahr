@@ -154,6 +154,7 @@ export default function DinoGame() {
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(null);
   const [started, setStarted] = useState(false);
+  const [gameId, setGameId] = useState(0);
   const gameRef = useRef({});
   const scoreRef = useRef(0);
   const gameOverRef = useRef(false);
@@ -183,6 +184,7 @@ export default function DinoGame() {
     setShowResult(false);
     setResult(null);
     setStarted(true);
+    setGameId((id) => id + 1);
   }, []);
 
   const handleGameEnd = useCallback(async (finalScore) => {
@@ -222,15 +224,15 @@ export default function DinoGame() {
     const handler = (e) => {
       if (e.key === " " || e.key === "ArrowUp") {
         e.preventDefault();
-        if (gameOverRef.current) {
+        if (gameOverRef.current && !showResult) {
           startGame();
-        } else {
+        } else if (!gameOverRef.current) {
           jump();
         }
       }
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setDuck(true);
+        if (!gameOverRef.current) setDuck(true);
       }
     };
     const upHandler = (e) => {
@@ -245,7 +247,7 @@ export default function DinoGame() {
       window.removeEventListener("keydown", handler);
       window.removeEventListener("keyup", upHandler);
     };
-  }, [jump, setDuck, startGame]);
+  }, [jump, setDuck, startGame, showResult]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -381,7 +383,7 @@ export default function DinoGame() {
     return () => {
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [handleGameEnd, profile]);
+  }, [handleGameEnd, profile, gameId]);
 
   useEffect(() => {
     startGame();

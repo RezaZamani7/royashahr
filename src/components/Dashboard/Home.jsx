@@ -22,7 +22,7 @@ export default function Home() {
             </div>
           </div>
           <div className="stat">
-            <span className="stat-icon">🪙</span>
+            <span className="stat-icon stat-icon-coin"></span>
             <div>
               <p className="stat-label">سکه ها</p>
               <p className="stat-value">{profile.coins?.toLocaleString("fa-IR") || "۰"}</p>

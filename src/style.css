@@ -243,8 +243,28 @@ body {
 }
 
 .stat-icon {
-  font-size: 2rem;
-}
+    font-size: 2rem;
+  }
+
+  .stat-icon-coin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe066, #f0b429, #d48a1a);
+    box-shadow: 0 2px 6px rgba(212, 138, 26, 0.5), inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.3);
+    position: relative;
+  }
+  .stat-icon-coin::after {
+    content: "";
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(122, 78, 10, 0.3);
+  }
 
 .stat-label {
   color: var(--text-light);
