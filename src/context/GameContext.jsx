@@ -15,54 +15,68 @@ export function GameProvider({ children }) {
   const ensureProfile = async () => {
     if (!user) return null;
 
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", user.uid)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", user.uid)
+        .maybeSingle();
 
-    if (data) {
-      const safe = {
-        total_score: data.total_score ?? 0,
-        coins: data.coins ?? 0,
-        flags: data.flags ?? 0,
-        high_2048: data.high_2048 ?? 0,
-        high_tetris: data.high_tetris ?? 0,
-        high_dino: data.high_dino ?? 0,
-        high_snake: data.high_snake ?? 0,
+      if (data) {
+        const safe = {
+          total_score: data.total_score ?? 0,
+          coins: data.coins ?? 0,
+          flags: data.flags ?? 0,
+          high_2048: data.high_2048 ?? 0,
+          high_tetris: data.high_tetris ?? 0,
+          high_dino: data.high_dino ?? 0,
+          high_snake: data.high_snake ?? 0,
+        };
+        setProfile({ ...data, ...safe });
+        return { ...data, ...safe };
+      }
+
+      if (error) {
+        console.error("[ensureProfile] SELECT error:", error);
+      }
+
+      console.log("[ensureProfile] Creating new profile for user:", user.uid);
+      const newProfile = {
+        id: user.uid,
+        username: user.email?.split("@")[0] ?? "user",
+        email: user.email ?? "",
+        total_score: 0,
+        coins: 0,
+        flags: 0,
+        high_2048: 0,
+        high_tetris: 0,
+        high_dino: 0,
+        high_snake: 0,
       };
-      setProfile({ ...data, ...safe });
-      return { ...data, ...safe };
-    }
 
-    if (error) {
-      console.error("[ensureProfile] SELECT error:", error);
-    }
+      const { data: inserted, error: insertErr } = await supabase
+        .from("users")
+        .insert(newProfile)
+        .select()
+        .single();
 
-    const newProfile = {
-      id: user.uid,
-      username: user.email?.split("@")[0] ?? "user",
-      email: user.email ?? "",
-      total_score: 0,
-      coins: 0,
-      flags: 0,
-      high_2048: 0,
-      high_tetris: 0,
-      high_dino: 0,
-      high_snake: 0,
-    };
-    const { data: inserted, error: insertErr } = await supabase
-      .from("users")
-      .insert(newProfile)
-      .select()
-      .single();
+      if (insertErr) {
+        console.error("[ensureProfile] INSERT error:", {
+          message: insertErr.message,
+          code: insertErr.code,
+          details: insertErr.details,
+          hint: insertErr.hint,
+        });
+        return null;
+      }
 
-    if (insertErr) {
-      console.error("[ensureProfile] INSERT error:", insertErr);
+      console.log("[ensureProfile] Profile created successfully:", inserted?.id);
+      setProfile(inserted);
+      return inserted;
+    } catch (err) {
+      console.error("[ensureProfile] Unexpected error:", err);
       return null;
     }
-    setProfile(inserted);
-    return inserted;
   };
 
   useEffect(() => {
@@ -88,20 +102,22 @@ export function GameProvider({ children }) {
 
   const submitScore = async (game, score) => {
     if (!user) {
+      console.error("[submitScore] No user");
       return null;
     }
 
     const field = GAME_FIELD[game];
+    console.log("[submitScore] Starting", { game, field, score, userId: user.uid });
 
     const freshProfile = await ensureProfile();
     if (!freshProfile) {
+      console.error("[submitScore] Could not load or create profile");
       return null;
     }
 
     const oldHigh = freshProfile[field] || 0;
     const newHigh = Math.max(oldHigh, score);
     const isNewRecord = score > oldHigh;
-
     const coinsEarned = Math.floor(score / 100);
     let flagsEarned = 0;
     if (isNewRecord) {
@@ -116,23 +132,63 @@ export function GameProvider({ children }) {
       [field]: newHigh,
     };
 
-    const { error } = await supabase
+    console.log("[submitScore] Attempting UPDATE:", { updates, userId: user.uid });
+
+    const { data: updated, error: updateError } = await supabase
       .from("users")
       .update(updates)
-      .eq("id", user.uid);
+      .eq("id", user.uid)
+      .select();
 
-    if (error) {
-      console.error("[submitScore] UPDATE error:", { error, field, score, userId: user.uid });
-      return null;
+    console.log("[submitScore] UPDATE result:", { updated, updateError });
+
+    if (updateError) {
+      console.error("[submitScore] UPDATE failed:", updateError.message);
+
+      const { data: upserted, error: upsertError } = await supabase
+        .from("users")
+        .upsert({
+          id: user.uid,
+          username: freshProfile.username,
+          email: freshProfile.email,
+          ...updates,
+        }, { onConflict: "id" })
+        .select()
+        .single();
+
+      if (upsertError) {
+        console.error("[submitScore] UPSERT fallback failed:", upsertError.message);
+        return null;
+      }
+
+      console.log("[submitScore] UPSERT fallback succeeded:", upserted);
+      setProfile(upserted);
+      return { coinsEarned, flagsEarned, isNewRecord, newHigh };
     }
 
-    setProfile((prev) => ({
-      ...prev,
-      total_score: updates.total_score,
-      coins: updates.coins,
-      flags: updates.flags,
-      [field]: newHigh,
-    }));
+    if (!updated || updated.length === 0) {
+      console.error("[submitScore] UPDATE affected 0 rows. Trying insert...");
+
+      const { data: inserted, error: insertError } = await supabase
+        .from("users")
+        .insert({ id: user.uid, ...updates })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error("[submitScore] INSERT fallback failed:", insertError.message);
+        return null;
+      }
+
+      console.log("[submitScore] INSERT fallback succeeded:", inserted);
+      setProfile(inserted);
+    } else {
+      console.log("[submitScore] UPDATE succeeded:", updated);
+      setProfile((prev) => ({
+        ...prev,
+        ...updates,
+      }));
+    }
 
     return { coinsEarned, flagsEarned, isNewRecord, newHigh };
   };
