@@ -87,9 +87,13 @@ export default function Snake() {
     if (gameOverRef.current) return;
     gameOverRef.current = true;
     setGameOver(true);
+    console.log("[Snake] gameOver, finalScore:", finalScore);
     if (finalScore > 0) {
       const res = await submitScore("snake", finalScore);
+      console.log("[Snake] submitScore result:", res);
       if (res) setResult(res);
+    } else {
+      console.log("[Snake] finalScore is 0, skipping submitScore");
     }
     setShowResult(true);
   }, [submitScore]);
