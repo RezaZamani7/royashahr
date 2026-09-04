@@ -879,30 +879,74 @@ body {
     width: 100%;
     height: auto;
   }
+
+  .game-page {
+    min-height: auto;
+    height: auto;
+  }
+
+  .game-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .game-page {
+    min-height: 100vh;
+  }
+
+  .tetris-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .tetris-board {
+    max-width: 60%;
+  }
+
+  .tetris-side {
+    display: none;
+  }
+
+  .game-header h1 {
+    font-size: 1.2rem;
+  }
 }
 
 /* Touch Controls for Mobile */
 .touch-controls {
   display: none;
   justify-content: center;
-  margin-top: 0;
-  padding: 16px;
-  position: relative;
+  padding: 12px;
+  position: sticky;
+  bottom: 0;
   width: 100%;
   box-sizing: border-box;
+  background: rgba(15, 15, 26, 0.95);
+  border-top: 1px solid var(--border);
+  z-index: 10;
 }
 
-/* Show touch controls on all non-desktop devices (touch-only) */
+/* Show touch controls on touch devices and small screens */
 @media (hover: none) {
   .touch-controls {
     display: flex;
   }
 }
 
-/* Also show on small screens up to tablet size */
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .touch-controls {
     display: flex;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .touch-controls {
+    display: flex;
+    padding: 8px;
   }
 }
 
@@ -913,6 +957,7 @@ body {
   grid-template-rows: repeat(3, 1fr);
   gap: 6px;
   width: 180px;
+  direction: ltr;
 }
 
 .dpad-btn {
