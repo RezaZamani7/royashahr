@@ -322,26 +322,46 @@ body {
   font-weight: 500;
 }
 
-/* Game Pages */
+/* Game Pages - Mobile optimized layout */
 .game-page {
   min-height: 100vh;
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+@media (hover: none) {
+  .game-page {
+    touch-action: manipulation;
+  }
 }
 
 .game-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 32px;
+  padding: 12px 16px;
   background: rgba(26, 26, 46, 0.95);
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .game-header {
+    padding: 8px 12px;
+  }
 }
 
 .game-header button {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 8px 20px;
+  padding: 8px 16px;
   color: var(--text);
   font-family: 'Vazirmatn', sans-serif;
   cursor: pointer;
@@ -355,23 +375,24 @@ body {
 }
 
 .game-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: white;
   font-weight: 700;
 }
 
 .game-scores {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .score-box {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 16px;
-  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
   color: var(--text-light);
+  white-space: nowrap;
 }
 
 /* Compact score bar for mobile - fixed at bottom above touch controls */
@@ -435,9 +456,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 40px;
-  min-height: 400px;
+  flex-grow: 1;
+  min-height: 0;
+  padding: 16px;
   gap: 16px;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .grid-2048 {
@@ -470,6 +494,10 @@ body {
   gap: 32px;
   padding: 24px;
   flex-wrap: wrap;
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .tetris-board {
@@ -519,7 +547,11 @@ body {
 .dino-container {
   display: flex;
   justify-content: center;
-  padding: 24px;
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
 }
 
 .dino-canvas {
@@ -537,8 +569,12 @@ body {
   justify-content: center;
   align-items: flex-start;
   gap: 24px;
-  padding: 24px;
+  padding: 12px;
   flex-wrap: wrap;
+  flex-grow: 1;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .snake-canvas {
@@ -885,14 +921,17 @@ body {
   }
 
   .game-header {
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px 16px;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .game-header h1 {
+    font-size: 1.1rem;
   }
 
   .game-scores {
-    flex-wrap: wrap;
-    justify-content: center;
+    display: none;
   }
 
   .grid-2048 {
@@ -900,10 +939,15 @@ body {
     height: 280px;
   }
 
-  .tetris-container {
-    flex-direction: column;
-    align-items: center;
-  }
+.tetris-container {
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  max-height: calc(100vh - 160px); /* Header + score bar + touch controls */
+  overflow-y: auto;
+  padding: 12px 0;
+  box-sizing: border-box;
+}
 
   .tetris-cell {
     width: 24px;
@@ -936,14 +980,12 @@ body {
   }
 
   .game-page {
-    min-height: auto;
-    height: auto;
+    min-height: 100vh;
+    height: 100vh;
   }
 
   .game-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    flex-shrink: 0;
   }
 }
 
@@ -953,9 +995,16 @@ body {
     min-height: 100vh;
   }
 
+  .game-header {
+    padding: 8px 12px;
+  }
+
   .tetris-container {
     flex-direction: row;
     align-items: flex-start;
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   .tetris-board {
@@ -968,6 +1017,11 @@ body {
 
   .game-header h1 {
     font-size: 1.2rem;
+  }
+
+  .touch-controls {
+    height: 90px;
+    padding: 6px 8px;
   }
 }
 
