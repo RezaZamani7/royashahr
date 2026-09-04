@@ -278,6 +278,12 @@ export default function Tetris() {
 
   return (
     <div className="game-page">
+      <div className="score-bar-mobile">
+        <div className="score-box">امتیاز: {score.toLocaleString("fa-IR")}</div>
+        <div className="score-box">سطرها: {lines.toLocaleString("fa-IR")}</div>
+        <div className="score-box">سطح: {level.toLocaleString("fa-IR")}</div>
+        <div className="score-box">بهترین: {(profile?.high_tetris || 0).toLocaleString("fa-IR")}</div>
+      </div>
       <div className="game-header">
         <button onClick={() => navigate("/dashboard")}>← بازگشت</button>
         <h1>تتریس</h1>

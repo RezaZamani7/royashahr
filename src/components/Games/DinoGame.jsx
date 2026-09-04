@@ -410,6 +410,10 @@ export default function DinoGame() {
 
   return (
     <div className="game-page">
+      <div className="score-bar-mobile">
+        <div className="score-box">امتیاز: {score.toLocaleString("fa-IR")}</div>
+        <div className="score-box">بهترین: {(profile?.high_dino || 0).toLocaleString("fa-IR")}</div>
+      </div>
       <div className="game-header">
         <button onClick={() => navigate("/dashboard")}>← بازگشت</button>
         <h1>دایناسور</h1>

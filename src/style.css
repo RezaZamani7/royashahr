@@ -374,6 +374,61 @@ body {
   color: var(--text-light);
 }
 
+/* Compact score bar for mobile - fixed at bottom above touch controls */
+.score-bar-mobile {
+  display: none;
+  position: fixed;
+  bottom: 120px;
+  left: 0;
+  right: 0;
+  padding: 8px 16px;
+  background: rgba(15, 15, 26, 0.95);
+  border-top: 1px solid var(--border);
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+.score-bar-mobile .score-box {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  margin: 0 4px;
+}
+
+@media (hover: none) {
+  .score-bar-mobile {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 1024px) {
+  .score-bar-mobile {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .score-bar-mobile {
+    bottom: 100px;
+  }
+}
+
+/* Hide regular score header on mobile when touch controls active */
+@media (hover: none) {
+  .game-header .game-scores {
+    display: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .game-header .game-scores {
+    display: none;
+  }
+}
+
 /* 2048 Game */
 .game2048-container {
   display: flex;
@@ -919,18 +974,19 @@ body {
 /* Touch Controls for Mobile */
 .touch-controls {
   display: none;
-  justify-content: center;
-  padding: 12px;
-  position: sticky;
+  position: fixed;
   bottom: 0;
-  width: 100%;
-  box-sizing: border-box;
+  left: 0;
+  right: 0;
+  height: 120px;
+  padding: 12px 8px;
   background: rgba(15, 15, 26, 0.95);
   border-top: 1px solid var(--border);
-  z-index: 10;
+  z-index: 1000;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
-/* Show touch controls on touch devices and small screens */
 @media (hover: none) {
   .touch-controls {
     display: flex;
@@ -946,21 +1002,59 @@ body {
 @media (max-width: 768px) and (orientation: landscape) {
   .touch-controls {
     display: flex;
-    padding: 8px;
+    height: 100px;
+    padding: 8px 6px;
   }
 }
 
-/* D-pad for Snake */
+.touch-left {
+  position: absolute;
+  left: 8px;
+  bottom: 12px;
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .touch-left {
+    bottom: 8px;
+    left: 6px;
+  }
+}
+
+.touch-right {
+  position: absolute;
+  right: 8px;
+  bottom: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .touch-right {
+    bottom: 8px;
+    right: 6px;
+  }
+}
+
+/* D-pad - uses absolute positioning to avoid RTL grid issues */
 .dpad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 6px;
+  position: relative;
   width: 180px;
+  height: 180px;
   direction: ltr;
 }
 
+.dpad.small {
+  width: 150px;
+  height: 150px;
+}
+
 .dpad-btn {
+  position: absolute;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -976,12 +1070,14 @@ body {
   transition: all 0.2s;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+  pointer-events: auto;
 }
 
 .dpad-btn:active {
   background: var(--primary);
   color: white;
-  transform: scale(0.95);
+  transform: scale(0.9);
 }
 
 .dpad-btn.empty {
@@ -991,23 +1087,32 @@ body {
   transform: none;
 }
 
-.dpad-btn.dpad-center {
-  background: var(--primary);
-  color: white;
-  font-size: 1.8rem;
+.dpad.small .dpad-btn {
+  width: 46px;
+  height: 46px;
+  font-size: 1.2rem;
 }
 
-.dpad-btn.dpad-center:active {
-  background: var(--primary-dark);
-  transform: scale(0.95);
-}
+.dpad-up { top: 0; left: 64px; }
+.dpad-down { bottom: 0; left: 64px; }
+.dpad-left { top: 64px; left: 0; }
+.dpad-right { top: 64px; right: 0; }
+.dpad-center { top: 64px; left: 50%; transform: translateX(-50%); }
 
-.dpad-row-center {
-  display: flex;
-  justify-content: center;
-}
+.dpad-top-left { top: 0; left: 0; opacity: 0; }
+.dpad-top-right { top: 0; right: 0; opacity: 0; }
+.dpad-bottom-left { bottom: 0; left: 0; opacity: 0; }
+.dpad-bottom-right { bottom: 0; right: 0; opacity: 0; }
 
-/* Action buttons for Snake */
+.dpad.small .dpad-up { top: 0; left: 52px; }
+.dpad.small .dpad-down { bottom: 0; left: 52px; }
+.dpad.small .dpad-left { top: 52px; left: 0; }
+.dpad.small .dpad-right { top: 52px; right: 0; }
+.dpad.small .dpad-top-left { top: 0; left: 0; opacity: 0; }
+.dpad.small .dpad-top-right { top: 0; right: 0; opacity: 0; }
+.dpad.small .dpad-bottom-left { bottom: 0; left: 0; opacity: 0; }
+.dpad.small .dpad-bottom-right { bottom: 0; right: 0; opacity: 0; }
+
 .action-btn {
   width: 52px;
   height: 52px;
@@ -1024,22 +1129,15 @@ body {
   transition: all 0.2s;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .action-btn:active {
   background: var(--secondary);
   color: white;
-  transform: scale(0.95);
-}
-
-.snake-touch-controls {
-  flex-direction: row;
-  align-items: center;
-  gap: 24px;
-}
-
-.snake-touch-controls .dpad {
-  width: 180px;
+  transform: scale(0.9);
 }
 
 .snake-action-btn {
@@ -1048,14 +1146,9 @@ body {
   font-size: 1.3rem;
 }
 
-/* Dino touch controls */
-.dino-touch-controls {
-  flex-direction: row;
-  gap: 16px;
-}
-
 .dino-btn {
   flex: 1;
+  min-width: 80px;
   max-width: 120px;
   height: 60px;
   font-size: 1.1rem;
@@ -1071,32 +1164,10 @@ body {
   color: white;
 }
 
-/* Tetris touch controls */
-.tetris-touch-controls {
-  flex-direction: row;
-  gap: 16px;
-  align-items: center;
-}
-
-.tetris-touch-controls .dpad {
-  width: 150px;
-}
-
-.tetris-touch-controls .dpad-btn {
-  width: 46px;
-  height: 46px;
-  font-size: 1.2rem;
-}
-
 .tetris-touch-controls .action-btn {
   width: 46px;
   height: 46px;
   font-size: 1.2rem;
-}
-
-.game2048-touch-controls .dpad {
-  width: 180px;
-  justify-content: center;
 }
 
 .tetris-touch-controls .action-btn.rotate {
@@ -1107,4 +1178,9 @@ body {
 .tetris-touch-controls .action-btn.drop {
   background: var(--accent);
   color: white;
+}
+
+.game2048-touch-controls .dpad {
+  width: 180px;
+  height: 180px;
 }
