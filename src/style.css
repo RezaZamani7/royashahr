@@ -399,22 +399,24 @@ body {
 .score-bar-mobile {
   display: none;
   position: fixed;
-  bottom: 120px;
+  bottom: 0;
   left: 0;
   right: 0;
-  padding: 8px 16px;
+  padding: 4px 8px;
   background: rgba(15, 15, 26, 0.95);
   border-top: 1px solid var(--border);
   z-index: 999;
+  height: auto;
+  min-height: 28px;
   box-sizing: border-box;
 }
 
 .score-bar-mobile .score-box {
   display: inline-block;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  margin: 0 4px;
+  padding: 4px 8px;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  margin: 0 2px;
 }
 
 @media (hover: none) {
@@ -433,7 +435,11 @@ body {
 
 @media (max-width: 768px) and (orientation: landscape) {
   .score-bar-mobile {
-    bottom: 100px;
+    bottom: 0;
+    top: auto;
+    height: auto;
+    min-height: 28px;
+    padding: 4px 8px;
   }
 }
 
@@ -939,6 +945,38 @@ body {
     height: 280px;
   }
 
+  /* Portrait mobile - 2048 specific */
+  .score-bar-mobile {
+    top: 80px;
+    bottom: auto;
+  }
+
+  .game2048-container {
+    margin-top: 80px;
+    padding: 12px;
+  }
+
+  .swipe-hint {
+    margin-top: 8px;
+  }
+
+  .game2048-touch-controls {
+    position: absolute;
+    bottom: 140px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 180px;
+    height: 180px;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .game2048-touch-controls .dpad {
+    width: 180px;
+    height: 180px;
+  }
+
 .tetris-container {
   flex-direction: column;
   align-items: center;
@@ -1022,6 +1060,36 @@ body {
   .touch-controls {
     height: 90px;
     padding: 6px 8px;
+  }
+
+  .game2048-container {
+    align-items: flex-start;
+    padding: 12px;
+  }
+
+  .game2048-touch-controls {
+    position: absolute;
+    top: 80px;
+    right: 16px;
+    height: auto;
+    width: auto;
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .game2048-touch-controls .touch-left {
+    display: none;
+  }
+
+  .game2048-touch-controls .touch-right {
+    bottom: auto;
+    right: 0;
+  }
+
+  .game2048-touch-controls .dpad {
+    width: 150px;
+    height: 150px;
   }
 }
 
