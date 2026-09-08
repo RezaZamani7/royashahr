@@ -960,7 +960,7 @@ body {
     margin-top: 8px;
   }
 
-  .game2048-touch-controls {
+  .touch-controls.game2048-touch-controls {
     position: absolute;
     bottom: 140px;
     left: 50%;
