@@ -110,7 +110,7 @@ export function GameProvider({ children }) {
     const isNewRecord = score > oldHigh;
     const coinsEarned = Math.floor(score / 100);
     let flagsEarned = 0;
-    if (isNewRecord) {
+    if (isNewRecord && oldHigh > 0) {
       flagsEarned = Math.floor((score - oldHigh) / 100);
     }
 
