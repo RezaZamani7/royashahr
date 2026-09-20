@@ -45,3 +45,6 @@ CREATE INDEX IF NOT EXISTS idx_users_total_score ON users(total_score DESC);
 
 -- 5. ⚠️ اگر جدول از قبل وجود داشته باشد و ستون high_snake ندارد، این خط را اجرا کنید:
 -- ALTER TABLE users ADD COLUMN IF NOT EXISTS high_snake INTEGER NOT NULL DEFAULT 0;
+
+-- 6. ستون آواتار (برای فضای سه‌بعدی)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar TEXT DEFAULT NULL;

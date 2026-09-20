@@ -31,6 +31,7 @@ export function GameProvider({ children }) {
           high_tetris: data.high_tetris ?? 0,
           high_dino: data.high_dino ?? 0,
           high_snake: data.high_snake ?? 0,
+          avatar: data.avatar ?? null,
         };
         setProfile({ ...data, ...safe });
         return { ...data, ...safe };
@@ -51,6 +52,7 @@ export function GameProvider({ children }) {
         high_tetris: 0,
         high_dino: 0,
         high_snake: 0,
+        avatar: null,
       };
       const { data: inserted, error: insertErr } = await supabase
         .from("users")
@@ -82,6 +84,12 @@ export function GameProvider({ children }) {
     if (!user || !profile) return;
     await supabase.from("users").update({ username: newName }).eq("id", user.uid);
     setProfile((prev) => ({ ...prev, username: newName }));
+  };
+
+  const updateAvatar = async (avatar) => {
+    if (!user) return;
+    await supabase.from("users").update({ avatar }).eq("id", user.uid);
+    setProfile((prev) => ({ ...prev, avatar }));
   };
 
   const GAME_FIELD = {
@@ -150,7 +158,7 @@ export function GameProvider({ children }) {
     return { coinsEarned, flagsEarned, isNewRecord, newHigh };
   };
 
-  const value = { profile, loadProfile: ensureProfile, submitScore, updateUsername };
+  const value = { profile, loadProfile: ensureProfile, submitScore, updateUsername, updateAvatar };
   return (
     <GameContext.Provider value={value}>
       {children}

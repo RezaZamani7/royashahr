@@ -11,6 +11,9 @@ export default function Home() {
       <div className="hero">
         <h1>به رویاشهر خوش آمدید!</h1>
         <p>مرکز بازی های آنلاین - سرگرمی و مسابقه</p>
+        <button className="btn-primary world-enter-btn" onClick={() => navigate("/world")}>
+          🏙️ ورود به شهر سه‌بعدی
+        </button>
       </div>
 
       {profile && (

@@ -14,7 +14,7 @@ export default function Login() {
     setError("");
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/world");
     } catch (err) {
       const msg = err?.message || "";
       if (msg.includes("Invalid login") || msg.includes("invalid credentials")) {
