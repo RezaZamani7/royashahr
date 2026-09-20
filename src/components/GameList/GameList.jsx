@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useGame } from "../context/GameContext";
+import { useGame } from "../../context/GameContext";
 
 // صفحه‌ی لیست بازی‌ها که داخل مرورگر داخلی ساختمان بازی باز می‌شود.
 export default function GameList() {

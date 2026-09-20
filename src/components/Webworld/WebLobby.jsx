@@ -46,7 +46,7 @@ export default function WebLobby() {
   // ---------- هسته‌ی سه‌بعدی ----------
   useEffect(() => {
     const container = containerRef.current;
-    if (!container || !container.children.length) return;
+    if (!container) return;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);

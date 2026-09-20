@@ -1348,3 +1348,524 @@ body {
     gap: 8px;
   }
 }
+
+/* =========================================================
+   3D World (رویاشهر شهر سه‌بعدی)
+   ========================================================= */
+.weblobby {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #87ceeb;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+}
+
+.world-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.world-canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* نوار بالای شهر */
+.world-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(rgba(10, 12, 24, 0.72), rgba(10, 12, 24, 0));
+  pointer-events: none;
+}
+
+.world-brand {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.world-topbar-actions {
+  display: flex;
+  gap: 8px;
+  pointer-events: auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.world-btn {
+  background: rgba(15, 15, 26, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  padding: 8px 12px;
+  color: #fff;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.world-btn:hover { background: rgba(108, 92, 231, 0.9); }
+.world-btn:active { transform: scale(0.96); }
+
+/* راهنما */
+.world-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.78rem;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* جوی‌استیک موبایل/تبلت (گوشه پایین چپ) */
+.world-joystick {
+  position: absolute;
+  bottom: 26px;
+  left: 24px;
+  z-index: 18;
+  pointer-events: none;
+}
+.world-joystick > * {
+  pointer-events: auto;
+}
+
+.joystick-base {
+  position: relative;
+  border-radius: 50%;
+  background: rgba(15, 15, 26, 0.42);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  touch-action: none;
+  backdrop-filter: blur(2px);
+}
+.joystick-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #c7c7d1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* ناحیه تعامل با ساختمان‌ها */
+.world-action {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 15, 26, 0.88);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  max-width: 92vw;
+}
+.world-action-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0;
+}
+.world-action-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.world-enter-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  color: #fff;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.world-enter-btn:active { transform: scale(0.96); }
+.world-enter-btn:hover { box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5); }
+
+/* تریپ‌هاینت پایین برای موبایل: جوی‌استیک چپ + راهنمای کناری */
+.world-hint {
+  white-space: normal;
+  max-width: 60vw;
+  left: 50%;
+  bottom: 14px;
+}
+
+/* ===== مرورگر داخلی (iframe) ===== */
+.browser-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.browser-modal {
+  position: relative;
+  width: min(960px, 100%);
+  height: min(90vh, 90dvh, 820px);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+}
+.browser-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.browser-modal-title {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.browser-modal-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.browser-back-btn {
+  background: var(--primary);
+  border: none;
+  border-radius: 10px;
+  padding: 7px 14px;
+  color: #fff;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+.browser-close-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.browser-modal-frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: var(--bg);
+}
+
+/* ===== انتخاب آواتار ===== */
+.avatar-picker-modal {
+  max-width: 720px;
+  width: min(720px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+}
+.avatar-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+  margin: 8px 0 12px;
+}
+.avatar-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+}
+.avatar-card:hover { border-color: var(--primary); }
+.avatar-card.selected {
+  border-color: var(--accent);
+  background: rgba(0, 206, 201, 0.08);
+}
+.avatar-preview {
+  width: 90px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #0b1220;
+}
+.avatar-preview-loading {
+  width: 90px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  border-radius: 10px;
+  background: #0b1220;
+}
+.avatar-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+.avatar-check {
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+/* ===== صفحات مدیریت (تیکت/ایمیل) داخل iframe ===== */
+.mgmt-page {
+  min-height: 100vh;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+.mgmt-page h1 {
+  color: #fff;
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.mgmt-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.mgmt-form label {
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+.mgmt-form input,
+.mgmt-form textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.95rem;
+  resize: vertical;
+}
+.mgmt-form input:focus,
+.mgmt-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.mgmt-success {
+  background: var(--bg-card);
+  border: 1px solid var(--success);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  color: var(--success);
+  font-weight: 600;
+}
+.mgmt-note {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.82rem;
+  margin-top: 14px;
+}
+
+/* ===== لیست بازی‌ها داخل ساختمان بازی ===== */
+.gamelist-page {
+  min-height: 100vh;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 20px;
+}
+.gamelist-page h1 {
+  color: #fff;
+  font-size: 1.7rem;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* دکمه ورود به شهر در صفحه داشبورد */
+.world-enter-btn {
+  margin-top: 16px;
+  display: inline-block;
+}
+
+/* ===== موبایل / تبلت: نمای کامل ===== */
+@media (max-width: 1024px) {
+  .world-topbar {
+    padding: 8px 10px;
+    align-items: flex-start;
+  }
+  .world-topbar-actions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .world-btn {
+    max-width: 160px;
+    font-size: 0.76rem;
+    padding: 7px 10px;
+  }
+  .world-hint {
+    max-width: 46vw;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .world-joystick {
+    bottom: 16px;
+    left: 14px;
+  }
+  .joystick-base {
+    width: 96px;
+    height: 96px;
+  }
+  .joystick-knob {
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+  }
+  .world-action {
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 94vw;
+    padding: 12px 14px;
+  }
+  .world-enter-btn {
+    padding: 9px 14px;
+    font-size: 0.84rem;
+  }
+}
+
+/* موبایل کوچک (۴۸۰px و کمتر) */
+@media (max-width: 480px) {
+  .world-btn:last-of-type {
+    display: none; /* دکمه دوربین روی موبایل های خیلی کوچک پنهان (ران را با تاچ انجام می‌دهند) */
+  }
+  .world-brand {
+    font-size: 1.05rem;
+  }
+  .browser-modal {
+    width: 100%;
+    height: 92dvh;
+    border-radius: 0;
+  }
+  .avatar-picker-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .avatar-preview {
+    width: 70px;
+    height: 96px;
+  }
+  .avatar-preview-loading {
+    width: 70px;
+    height: 96px;
+  }
+}
+
+/* تبلت/دسکتاپ: جوی‌استیک فقط برای دستگاه‌های لمسی نشان داده می‌شود */
+@media (hover: hover) and (pointer: fine) {
+  .world-joystick {
+    display: none;
+  }
+}
+
+/* هندسه شدن در صفحات داخلی iframe و داشبورد */
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 24px;
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  border: none;
+  border-radius: 12px;
+  padding: 12px 32px;
+  color: white;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+/* بارگذاری lazy برای شهر سه‌بعدی */
+.weblobby-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-size: 1.1rem;
+}

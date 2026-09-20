@@ -170,7 +170,7 @@ export default function buildCity(scene) {
     min: { x: mgmtX - mgmtW / 2, z: mgmtZ - mgmtD / 2 },
     max: { x: mgmtX + mgmtW / 2, z: mgmtZ + mgmtD / 2 },
   });
-  const managementZone = { x: mgmtX, z: mgmtZ - mgmtD / 2 - 5, r: 6 };
+  const managementZone = { x: mgmtX, z: mgmtZ + mgmtD / 2 + 5, r: 6 };
 
   // درب مدیریت (در سمت رو به میدان)
   const doorMat = new THREE.MeshLambertMaterial({ color: 0x111827 });
@@ -208,7 +208,7 @@ export default function buildCity(scene) {
     min: { x: gameX - gameW / 2, z: gameZ - gameD / 2 },
     max: { x: gameX + gameW / 2, z: gameZ + gameD / 2 },
   });
-  const gamesZone = { x: gameX, z: gameZ + gameD / 2 + 5, r: 6 };
+  const gamesZone = { x: gameX, z: gameZ - gameD / 2 - 5, r: 6 };
 
   const gameDoor = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 0.3), doorMat);
   gameDoor.position.set(gameX, 3, gameZ - gameD / 2 - 0.2);

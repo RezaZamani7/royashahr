@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { GameProvider } from "./context/GameContext";
 import Login from "./components/Auth/Login";
@@ -9,11 +10,13 @@ import Tetris from "./components/Games/Tetris";
 import DinoGame from "./components/Games/DinoGame";
 import Snake from "./components/Games/Snake";
 import Leaderboard from "./components/Leaderboard/Leaderboard";
-import WebLobby from "./components/Webworld/WebLobby";
 import Support from "./components/Management/Support";
 import Email from "./components/Management/Email";
 import GameList from "./components/GameList/GameList";
 import "./style.css";
+
+// فضای سه‌بعدی به‌صورت lazy بارگذاری می‌شود تا three.js در باندل اولیه نباشد
+const WebLobby = lazy(() => import("./components/Webworld/WebLobby"));
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -31,21 +34,23 @@ function App() {
       <AuthProvider>
         <GameProvider>
           <div className="app" dir="rtl">
-            <Routes>
-              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-              <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-              <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-              <Route path="/world" element={<PrivateRoute><WebLobby /></PrivateRoute>} />
-              <Route path="/support" element={<PrivateRoute><Support /></PrivateRoute>} />
-              <Route path="/email" element={<PrivateRoute><Email /></PrivateRoute>} />
-              <Route path="/games" element={<PrivateRoute><GameList /></PrivateRoute>} />
-              <Route path="/game/2048" element={<PrivateRoute><Game2048 /></PrivateRoute>} />
-              <Route path="/game/tetris" element={<PrivateRoute><Tetris /></PrivateRoute>} />
-              <Route path="/game/dino" element={<PrivateRoute><DinoGame /></PrivateRoute>} />
-              <Route path="/game/snake" element={<PrivateRoute><Snake /></PrivateRoute>} />
-              <Route path="/leaderboard" element={<PrivateRoute><Leaderboard /></PrivateRoute>} />
-              <Route path="*" element={<Navigate to="/login" />} />
-            </Routes>
+            <Suspense fallback={<div className="weblobby-loading">در حال بارگذاری شهر…</div>}>
+              <Routes>
+                <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+                <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="/world" element={<PrivateRoute><WebLobby /></PrivateRoute>} />
+                <Route path="/support" element={<PrivateRoute><Support /></PrivateRoute>} />
+                <Route path="/email" element={<PrivateRoute><Email /></PrivateRoute>} />
+                <Route path="/games" element={<PrivateRoute><GameList /></PrivateRoute>} />
+                <Route path="/game/2048" element={<PrivateRoute><Game2048 /></PrivateRoute>} />
+                <Route path="/game/tetris" element={<PrivateRoute><Tetris /></PrivateRoute>} />
+                <Route path="/game/dino" element={<PrivateRoute><DinoGame /></PrivateRoute>} />
+                <Route path="/game/snake" element={<PrivateRoute><Snake /></PrivateRoute>} />
+                <Route path="/leaderboard" element={<PrivateRoute><Leaderboard /></PrivateRoute>} />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </Routes>
+            </Suspense>
           </div>
         </GameProvider>
       </AuthProvider>
