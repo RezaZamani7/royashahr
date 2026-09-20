@@ -160,6 +160,10 @@ export default function DinoGame() {
   const scoreRef = useRef(0);
   const gameOverRef = useRef(false);
   const startedRef = useRef(false);
+  const profileRef = useRef(profile);
+  useEffect(() => {
+    profileRef.current = profile;
+  }, [profile]);
 
   const startGame = useCallback(() => {
     const game = {
@@ -192,11 +196,11 @@ export default function DinoGame() {
     if (gameOverRef.current) return;
     gameOverRef.current = true;
     setGameOver(true);
+    setShowResult(true);
     if (finalScore > 0) {
       const res = await submitScore("dino", finalScore);
       if (res) setResult(res);
     }
-    setShowResult(true);
   }, [submitScore]);
 
   const jump = useCallback(() => {
@@ -310,7 +314,7 @@ export default function DinoGame() {
       ctx.textAlign = "left";
       ctx.font = "12px sans-serif";
       ctx.fillStyle = "#888";
-      ctx.fillText("HI " + (profile?.high_dino || 0).toString().padStart(5, "0"), 20, 30);
+      ctx.fillText("HI " + (profileRef.current?.high_dino || 0).toString().padStart(5, "0"), 20, 30);
     };
 
     const update = () => {
@@ -402,7 +406,7 @@ export default function DinoGame() {
     return () => {
       if (animId) cancelAnimationFrame(animId);
     };
-  }, [handleGameEnd, profile, gameId]);
+  }, [handleGameEnd, gameId]);
 
   useEffect(() => {
     startGame();
