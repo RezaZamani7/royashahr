@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
+import AdBanner from "../Ads/AdBanner";
 
 const CANVAS_W = 800;
 const CANVAS_H = 200;
@@ -426,6 +427,8 @@ export default function DinoGame() {
           <div className="score-box">بهترین: {(profile?.high_dino || 0).toLocaleString("fa-IR")}</div>
         </div>
       </div>
+
+      <AdBanner slotKey="dino" />
 
       <div className="dino-container">
         <canvas

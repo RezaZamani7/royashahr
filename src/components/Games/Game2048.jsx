@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
+import AdBanner from "../Ads/AdBanner";
 
 const SIZE = 4;
 
@@ -244,6 +245,8 @@ export default function Game2048() {
           <div className="score-box">بهترین: {(profile?.high_2048 || 0).toLocaleString("fa-IR")}</div>
         </div>
       </div>
+
+      <AdBanner slotKey="2048" />
 
       <div className="game2048-container">
         <div

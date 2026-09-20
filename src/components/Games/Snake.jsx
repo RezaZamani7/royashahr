@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
+import AdBanner from "../Ads/AdBanner";
 
 const COLS = 25;
 const ROWS = 20;
@@ -283,6 +284,8 @@ export default function Snake() {
           <div className="score-box">بهترین: {(profile?.high_snake || 0).toLocaleString("fa-IR")}</div>
         </div>
       </div>
+
+      <AdBanner slotKey="snake" />
 
       <div className="snake-container">
         <canvas

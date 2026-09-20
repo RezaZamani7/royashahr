@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="728" height="90" viewBox="0 0 728 90">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6f4e37"/>
+      <stop offset="1" stop-color="#b78b5e"/>
+    </linearGradient>
+  </defs>
+  <rect width="728" height="90" fill="url(#bg)"/>
+  <circle cx="80" cy="45" r="26" fill="#fff" opacity="0.15"/>
+  <text x="340" y="42" font-family="Tahoma, Arial, sans-serif" font-size="30" fill="#fff" text-anchor="middle">کافه رویاشهر</text>
+  <text x="340" y="66" font-family="Tahoma, Arial, sans-serif" font-size="15" fill="#ffe8d6" text-anchor="middle">یک فنجان قهوه، یک دنیا انرژی</text>
+  <text x="640" y="52" font-family="Tahoma, Arial, sans-serif" font-size="16" fill="#fff" text-anchor="middle">مشاهده →</text>
+</svg>

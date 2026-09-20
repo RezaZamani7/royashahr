@@ -1,5 +1,6 @@
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
+import AdBanner from "../Ads/AdBanner";
 
 export default function Home() {
   const { profile } = useGame();
@@ -37,6 +38,8 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      <AdBanner slotKey="home" />
 
       <div className="games-grid">
         <div className="game-card" onClick={() => navigate("/game/2048")}>
