@@ -155,7 +155,12 @@ export default function WebLobby() {
           player.position.x = nx;
           player.position.z = iz > 0 ? nz - col.penZ : nz + col.penZ;
         }
-        player.rotation.y = moveAngle;
+        // جهت محلی چهره‌ی کاراکتر -Z است؛ پس برای هم‌جهت شدن با حرکت باید π چرخانده شود
+        const targetRot = moveAngle + Math.PI;
+        let cur = player.rotation.y;
+        let diff = targetRot - cur;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        player.rotation.y = cur + diff * Math.min(1, dt * 14);
         const refs = player.userData.animRefs;
         if (refs) {
           const t = Date.now() * 0.008;
@@ -187,16 +192,22 @@ export default function WebLobby() {
         setAction(newAction);
       }
 
+      // جهت رو به روی کاراکتر (با توجه به اینکه محلی چهره -Z است)
+      const fwdX = -Math.sin(player.rotation.y);
+      const fwdZ = -Math.cos(player.rotation.y);
       if (camModeRef.current === "first") {
-        const fwdX = Math.sin(player.rotation.y);
-        const fwdZ = -Math.cos(player.rotation.y);
         camPos.set(player.position.x, 1.45, player.position.z);
         camera.position.copy(camPos);
         camera.lookAt(player.position.x + fwdX * 10, 1.3, player.position.z + fwdZ * 10);
       } else {
+        // دوربین پشت کاراکتر و هم‌زمان با چرخش او حرکت می‌کند
         const dist = 7;
         const height = 3.8;
-        camPos.set(player.position.x, height, player.position.z + dist);
+        camPos.set(
+          player.position.x - fwdX * dist,
+          height,
+          player.position.z - fwdZ * dist
+        );
         camera.position.copy(camPos);
         camera.lookAt(player.position.x, 1.2, player.position.z);
       }
