@@ -139,7 +139,7 @@ export default function WebLobby() {
       if (len > 0) {
         ix /= len;
         iz /= len;
-        // حرکت
+        const moveAngle = Math.atan2(ix, iz);
         let nx = player.position.x + ix * SPEED * dt;
         let nz = player.position.z + iz * SPEED * dt;
         nx = Math.max(-WORLD_HALF, Math.min(WORLD_HALF, nx));
@@ -155,11 +155,25 @@ export default function WebLobby() {
           player.position.x = nx;
           player.position.z = iz > 0 ? nz - col.penZ : nz + col.penZ;
         }
-        // چرخش آواتار به سمت حرکت (صورت آواتار رو به -Z است)
-        player.rotation.y = Math.atan2(-ix, -iz);
+        player.rotation.y = moveAngle;
+        const refs = player.userData.animRefs;
+        if (refs) {
+          const t = Date.now() * 0.008;
+          refs.leftLeg.rotation.x = Math.sin(t) * 0.6;
+          refs.rightLeg.rotation.x = Math.sin(t + Math.PI) * 0.6;
+          refs.leftArm.rotation.x = Math.sin(t + Math.PI) * 0.4;
+          refs.rightArm.rotation.x = Math.sin(t) * 0.4;
+        }
+      } else {
+        const refs = player.userData.animRefs;
+        if (refs) {
+          refs.leftLeg.rotation.x = 0;
+          refs.rightLeg.rotation.x = 0;
+          refs.leftArm.rotation.x = 0;
+          refs.rightArm.rotation.x = 0;
+        }
       }
 
-      // تشخیص نزدیکی به ساختمان‌ها
       const px = player.position.x;
       const pz = player.position.z;
       let newAction = null;
@@ -173,22 +187,16 @@ export default function WebLobby() {
         setAction(newAction);
       }
 
-      // دوربین
-      const rotY = player.rotation.y;
-      const fwdX = Math.sin(rotY);
-      const fwdZ = -Math.cos(rotY);
       if (camModeRef.current === "first") {
+        const fwdX = Math.sin(player.rotation.y);
+        const fwdZ = -Math.cos(player.rotation.y);
         camPos.set(player.position.x, 1.45, player.position.z);
         camera.position.copy(camPos);
         camera.lookAt(player.position.x + fwdX * 10, 1.3, player.position.z + fwdZ * 10);
       } else {
         const dist = 7;
         const height = 3.8;
-        camPos.set(
-          player.position.x - fwdX * dist,
-          height,
-          player.position.z - fwdZ * dist
-        );
+        camPos.set(player.position.x, height, player.position.z + dist);
         camera.position.copy(camPos);
         camera.lookAt(player.position.x, 1.2, player.position.z);
       }

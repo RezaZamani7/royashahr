@@ -1,8 +1,5 @@
 import * as THREE from "three";
 
-// ساختار پیش‌فرض آواتارها به صورت رویه‌ای با شکل‌های پایه سه.js.
-// هر آواتار یک THREE.Group است که در WebLobby به صحنه اضافه و حرکت داده می‌شود.
-
 const SKIN = 0xf2c9a0;
 const SKIN2 = 0xe0ac69;
 
@@ -32,67 +29,70 @@ function buildHumanoid({
   pants,
   shoes,
   hair,
-  hairStyle, // "long" | "short" | "ponytail" | "cap"
+  hairStyle,
   sweatShirt = false,
 }) {
   const root = new THREE.Group();
+  const animRefs = { leftLeg: null, rightLeg: null, leftArm: null, rightArm: null };
 
-  // پاها
-  const legY = -0.55;
-  const legL = box(0.16, 0.5, 0.16, pants);
-  legL.position.set(-0.13, legY, 0);
-  const legR = box(0.16, 0.5, 0.16, pants);
-  legR.position.set(0.13, legY, 0);
+  const legGroupL = new THREE.Group();
+  const legGroupR = new THREE.Group();
+  legGroupL.position.set(-0.13, 0.55, 0);
+  legGroupR.position.set(0.13, 0.55, 0);
 
-  // کفش
+  const legL = box(0.16, 0.55, 0.16, pants);
+  legL.position.set(0, -0.275, 0);
   const shoeL = box(0.18, 0.1, 0.24, shoes);
-  shoeL.position.set(-0.13, legY - 0.3, 0.03);
+  shoeL.position.set(0, -0.55, 0.03);
+  legGroupL.add(legL, shoeL);
+
+  const legR = box(0.16, 0.55, 0.16, pants);
+  legR.position.set(0, -0.275, 0);
   const shoeR = box(0.18, 0.1, 0.24, shoes);
-  shoeR.position.set(0.13, legY - 0.3, 0.03);
+  shoeR.position.set(0, -0.55, 0.03);
+  legGroupR.add(legR, shoeR);
 
-  // تنه
-  const torso = box(0.52, 0.55, 0.26, shirt, {
-    transparent: sweatShirt ? false : undefined,
-  });
-  torso.position.set(0, -0.1, 0);
-  if (sweatShirt) {
-    const band = box(0.54, 0.12, 0.28, 0xffffff);
-    band.position.set(0, -0.33, 0);
-    torso.add(band);
-  }
+  animRefs.leftLeg = legGroupL;
+  animRefs.rightLeg = legGroupR;
 
-  // بازوها
-  const armY = -0.05;
+  const torso = box(0.52, 0.55, 0.26, shirt);
+  torso.position.set(0, 0.825, 0);
+
+  const armGroupL = new THREE.Group();
+  const armGroupR = new THREE.Group();
+  armGroupL.position.set(-0.33, 0.825, 0);
+  armGroupR.position.set(0.33, 0.825, 0);
+
   const armL = box(0.11, 0.42, 0.13, shirt);
-  armL.position.set(-0.33, armY, 0);
-  const armR = box(0.11, 0.42, 0.13, shirt);
-  armR.position.set(0.33, armY, 0);
-
-  // دست‌ها
+  armL.position.set(0, -0.21, 0);
   const handL = box(0.09, 0.1, 0.1, skin);
-  handL.position.set(-0.33, armY - 0.26, 0);
+  handL.position.set(0, -0.47, 0);
+  armGroupL.add(armL, handL);
+
+  const armR = box(0.11, 0.42, 0.13, shirt);
+  armR.position.set(0, -0.21, 0);
   const handR = box(0.09, 0.1, 0.1, skin);
-  handR.position.set(0.33, armY - 0.26, 0);
+  handR.position.set(0, -0.47, 0);
+  armGroupR.add(armR, handR);
 
-  // سر
+  animRefs.leftArm = armGroupL;
+  animRefs.rightArm = armGroupR;
+
   const head = sphere(0.2, skin);
-  head.position.set(0, 0.46, 0);
+  head.position.set(0, 1.2, 0);
 
-  // چشم‌ها
   const eyeMat = mat(0x222222);
   const eyeGeo = new THREE.SphereGeometry(0.028, 10, 8);
   const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
-  eyeL.position.set(-0.07, 0.5, -0.18);
+  eyeL.position.set(-0.07, 1.2, -0.18);
   const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
-  eyeR.position.set(0.07, 0.5, -0.18);
+  eyeR.position.set(0.07, 1.2, -0.18);
 
-  // دهان
   const mouth = box(0.1, 0.02, 0.02, 0x7b3b2a);
-  mouth.position.set(0, 0.4, -0.195);
+  mouth.position.set(0, 1.1, -0.195);
 
-  root.add(legL, legR, shoeL, shoeR, torso, armL, armR, handL, handR, head, eyeL, eyeR, mouth);
+  root.add(legGroupL, legGroupR, torso, armGroupL, armGroupR, head, eyeL, eyeR, mouth);
 
-  // مو
   const hairGroup = new THREE.Group();
   if (hairStyle === "long") {
     const top = sphere(0.21, hair);
@@ -119,19 +119,18 @@ function buildHumanoid({
     brim.position.set(0, 0.12, 0.2);
     hairGroup.add(cap, brim);
   } else {
-    // short (پسر)
     const top = sphere(0.21, hair);
     top.position.y = 0.06;
     top.scale.set(1, 0.7, 1);
     hairGroup.add(top);
   }
-  hairGroup.position.y = 0.46;
+  hairGroup.position.y = 1.2;
   root.add(hairGroup);
 
+  root.userData.animRefs = animRefs;
   return root;
 }
 
-// چهار آواتار پیش‌فرض: دو دختر و دو پسر
 export const AVAATARS = [
   {
     id: "girl1",
