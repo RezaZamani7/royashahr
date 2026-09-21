@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import buildCity from "./city";
-import { getAvatar, AVAATARS } from "./avatars";
+import { loadAvatarWithAnimation, AVAATARS } from "./avatars";
 import Joystick from "./Joystick";
 import AvatarPicker from "./AvatarPicker";
 import BrowserModal from "./BrowserModal";
@@ -77,10 +77,26 @@ export default function WebLobby() {
 
     // شهر
     const city = buildCity(scene);
-    const player = getAvatar(avatarId);
-    player.position.set(city.spawn.x, 0, city.spawn.z);
-    avatarGroupRef.current = player;
-    scene.add(player);
+
+    // آواتار به صورت غیرهمزمان از فایل GLB بارگذاری می‌شود.
+    let player = null;
+    let avatarControllerRef = null;
+    let modelDisposed = false;
+
+    (async () => {
+      try {
+        const attrs = await loadAvatarWithAnimation(avatarId);
+        if (modelDisposed) return;
+        player = attrs.model;
+        avatarControllerRef = attrs.controller;
+        player.position.set(city.spawn.x, 0, city.spawn.z);
+        avatarGroupRef.current = player;
+        scene.add(player);
+        if (avatarControllerRef) avatarControllerRef.setState("idle");
+      } catch (e) {
+        console.error("[WebLobby] بارگذاری آواتار ناموفق بود:", e);
+      }
+    })();
 
     // مدیریت resize (موبایل/تبلت)
     const resize = () => {
@@ -96,12 +112,19 @@ export default function WebLobby() {
     window.addEventListener("orientationchange", resize);
 
     // ورودی صفحه‌کلید
-    const down = (e) => inputRef.current.keys.add(e.key);
+    let jumpUntil = 0;
+    const down = (e) => {
+      inputRef.current.keys.add(e.key);
+      if ((e.key === " " || e.key === "Spacebar") && jumpUntil < clock.getElapsedTime()) {
+        jumpUntil = clock.getElapsedTime() + 0.7;
+      }
+    };
     const up = (e) => inputRef.current.keys.delete(e.key);
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
 
     const clock = new THREE.Clock();
+    clock.start();
     let raf;
     const camPos = new THREE.Vector3();
     const collidePoint = new THREE.Vector3();
@@ -135,8 +158,13 @@ export default function WebLobby() {
       if (keys.has("a") || keys.has("ArrowLeft")) ix -= 1;
       if (keys.has("d") || keys.has("ArrowRight")) ix += 1;
 
+      if (!player) return;
+
       let len = Math.hypot(ix, iz);
-      if (len > 0) {
+      const moving = len > 0;
+      const now = clock.getElapsedTime();
+      const jumping = jumpUntil > now;
+      if (moving) {
         ix /= len;
         iz /= len;
         const moveAngle = Math.atan2(ix, iz);
@@ -161,23 +189,13 @@ export default function WebLobby() {
         let diff = targetRot - cur;
         diff = Math.atan2(Math.sin(diff), Math.cos(diff));
         player.rotation.y = cur + diff * Math.min(1, dt * 14);
-        const refs = player.userData.animRefs;
-        if (refs) {
-          const t = Date.now() * 0.008;
-          refs.leftLeg.rotation.x = Math.sin(t) * 0.6;
-          refs.rightLeg.rotation.x = Math.sin(t + Math.PI) * 0.6;
-          refs.leftArm.rotation.x = Math.sin(t + Math.PI) * 0.4;
-          refs.rightArm.rotation.x = Math.sin(t) * 0.4;
-        }
-      } else {
-        const refs = player.userData.animRefs;
-        if (refs) {
-          refs.leftLeg.rotation.x = 0;
-          refs.rightLeg.rotation.x = 0;
-          refs.leftArm.rotation.x = 0;
-          refs.rightArm.rotation.x = 0;
-        }
       }
+
+      // انتخاب حالت انیمیشن از طریق AnimationMixer با انتقال نرم
+      if (jumping) avatarControllerRef?.setState("jump");
+      else if (moving) avatarControllerRef?.setState(len > 0.6 ? "run" : "walk");
+      else avatarControllerRef?.setState("idle");
+      if (avatarControllerRef) avatarControllerRef.update(dt);
 
       const px = player.position.x;
       const pz = player.position.z;
@@ -222,13 +240,18 @@ export default function WebLobby() {
       window.removeEventListener("orientationchange", resize);
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
-      player.traverse((o) => {
-        if (o.geometry) o.geometry.dispose();
-        if (o.material) {
-          if (Array.isArray(o.material)) o.material.forEach((m) => m.dispose());
-          else o.material.dispose();
-        }
-      });
+      modelDisposed = true;
+      if (player) {
+        if (avatarControllerRef) avatarControllerRef.mixer.stopAllAction();
+        player.traverse((o) => {
+          if (o.geometry) o.geometry.dispose();
+          if (o.material) {
+            if (Array.isArray(o.material)) o.material.forEach((m) => m.dispose());
+            else o.material.dispose();
+          }
+        });
+        scene.remove(player);
+      }
       scene.traverse((o) => {
         if (o.geometry && o !== player && !o.userData) o.geometry.dispose();
       });
