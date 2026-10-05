@@ -8,7 +8,7 @@ import Joystick from "./Joystick";
 import AvatarPicker from "./AvatarPicker";
 import BrowserModal from "./BrowserModal";
 
-const SPEED = 7;
+const SPEED = 10;
 const PLAYER_RADIUS = 0.5;
 const WORLD_HALF = 150;
 
