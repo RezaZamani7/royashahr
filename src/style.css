@@ -741,6 +741,51 @@ body {
   color: white;
 }
 
+/* پاپ‌آپ شروع بازی: تبلیغ + راهنما */
+.game-intro-modal {
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+}
+
+.ad-modal-link {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.ad-modal-img {
+  display: block;
+  width: 100%;
+  max-height: 170px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.game-intro-guide {
+  text-align: right;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.game-intro-guide-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.game-intro-guide ul {
+  margin: 0;
+  padding-right: 20px;
+}
+
+.game-intro-guide li {
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+}
+
 .close-btn {
   background: transparent;
   border: 1px solid var(--border);

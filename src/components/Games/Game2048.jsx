@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
-import AdBanner from "../Ads/AdBanner";
+import AdModal from "../Webworld/AdModal";
 
 const SIZE = 4;
 
@@ -131,6 +131,10 @@ export default function Game2048() {
   const [result, setResult] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [showWon, setShowWon] = useState(false);
+  // پاپ‌آپ تبلیغ + راهنما قبل از شروع بازی
+  const [showIntro, setShowIntro] = useState(true);
+  const showIntroRef = useRef(true);
+  showIntroRef.current = showIntro;
   const gameOverRef = useRef(false);
   const hasWonRef = useRef(false);
   const gridRef = useRef(grid);
@@ -151,7 +155,7 @@ export default function Game2048() {
   }, [submitScore]);
 
   const move = useCallback((dir) => {
-    if (gameOverRef.current) return;
+    if (gameOverRef.current || showIntroRef.current) return;
     const current = gridRef.current;
     const oldGrid = cloneGrid(current);
     let result;
@@ -246,8 +250,6 @@ export default function Game2048() {
         </div>
       </div>
 
-      <AdBanner slotKey="2048" />
-
       <div className="game2048-container">
         <div
           className="grid-2048"
@@ -281,6 +283,18 @@ export default function Game2048() {
         gameOver={gameOver}
         onRestart={restart}
       />
+
+      {showIntro && (
+        <AdModal
+          title="۲۰۴۸"
+          instructions={[
+            "کلیدهای جهت‌دار یا کشیدن انگشت برای حرکت کاشی‌ها",
+            "کاشی‌های هم‌ارزش با برخورد به هم ادغام می‌شوند",
+            "هدف: ساختن کاشی ۲۰۴۸",
+          ]}
+          onClose={() => setShowIntro(false)}
+        />
+      )}
 
       {showWon && (
         <div className="modal-overlay">

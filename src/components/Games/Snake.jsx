@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
-import AdBanner from "../Ads/AdBanner";
+import AdModal from "../Webworld/AdModal";
 
 const COLS = 25;
 const ROWS = 20;
@@ -55,6 +55,8 @@ export default function Snake() {
   const [result, setResult] = useState(null);
   const [paused, setPaused] = useState(false);
   const [started, setStarted] = useState(false);
+  // پاپ‌آپ تبلیغ + راهنما قبل از شروع بازی
+  const [showIntro, setShowIntro] = useState(true);
 
   const snakeRef = useRef(createSnake());
   const dirRef = useRef(DIR.RIGHT);
@@ -267,8 +269,9 @@ export default function Snake() {
   }, [started, handleGameEnd]);
 
   useEffect(() => {
-    startGame();
-  }, [startGame]);
+    // بازی تا بسته شدن پاپ‌آپ تبلیغ/راهنما شروع نمی‌شود
+    if (!showIntro) startGame();
+  }, [showIntro, startGame]);
 
   return (
     <div className="game-page">
@@ -284,8 +287,6 @@ export default function Snake() {
           <div className="score-box">بهترین: {(profile?.high_snake || 0).toLocaleString("fa-IR")}</div>
         </div>
       </div>
-
-      <AdBanner slotKey="snake" />
 
       <div className="snake-container">
         <canvas
@@ -308,6 +309,19 @@ export default function Snake() {
           <button className="restart-btn" onClick={startGame}>شروع مجدد</button>
         </div>
       </div>
+
+      {showIntro && (
+        <AdModal
+          title="مار"
+          instructions={[
+            "کلیدهای جهت‌دار یا WASD برای حرکت",
+            "Space برای توقف/ادامه",
+            "با خوردن غذا، مار بزرگ‌تر و امتیاز بیشتر می‌شود",
+            "برخورد با دیوار یا بدن خود = پایان بازی",
+          ]}
+          onClose={() => setShowIntro(false)}
+        />
+      )}
 
       <TouchControls
         type="snake"

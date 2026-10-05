@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
-import AdBanner from "../Ads/AdBanner";
+import AdModal from "../Webworld/AdModal";
 
 const COLS = 10;
 const ROWS = 20;
@@ -40,6 +40,8 @@ export default function Tetris() {
   const [paused, setPaused] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(null);
+  // پاپ‌آپ تبلیغ + راهنما قبل از شروع بازی
+  const [showIntro, setShowIntro] = useState(true);
   const boardRef = useRef(board);
   const pieceRef = useRef(piece);
   const posRef = useRef(pos);
@@ -215,8 +217,9 @@ export default function Tetris() {
   }, [spawnPiece]);
 
   useEffect(() => {
-    startGame();
-  }, [startGame]);
+    // بازی تا بسته شدن پاپ‌آپ تبلیغ/راهنما شروع نمی‌شود
+    if (!showIntro) startGame();
+  }, [showIntro, startGame]);
 
   useEffect(() => {
     if (gameOver) return;
@@ -296,8 +299,6 @@ export default function Tetris() {
         </div>
       </div>
 
-      <AdBanner slotKey="tetris" />
-
       <div className="tetris-container">
         <div className="tetris-board">
           {renderBoard().map((row, ri) => (
@@ -334,6 +335,21 @@ export default function Tetris() {
         gameOver={gameOver}
         onRestart={startGame}
       />
+
+      {showIntro && (
+        <AdModal
+          title="تتریس"
+          instructions={[
+            "کلیدهای ← → برای حرکت قطعه",
+            "کلید ↑ برای چرخش قطعه",
+            "کلید ↓ برای پایین آوردن سریع‌تر",
+            "Space برای رها کردن سریع",
+            "کلید P برای توقف",
+            "با پر شدن هر سطر، امتیاز بگیرید",
+          ]}
+          onClose={() => setShowIntro(false)}
+        />
+      )}
 
       {showResult && (
         <div className="modal-overlay">

@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import TouchControls from "./TouchControls";
-import AdBanner from "../Ads/AdBanner";
+import AdModal from "../Webworld/AdModal";
 
 const CANVAS_W = 800;
 const CANVAS_H = 200;
@@ -157,6 +157,10 @@ export default function DinoGame() {
   const [result, setResult] = useState(null);
   const [started, setStarted] = useState(false);
   const [gameId, setGameId] = useState(0);
+  // پاپ‌آپ تبلیغ + راهنما قبل از شروع بازی
+  const [showIntro, setShowIntro] = useState(true);
+  const showIntroRef = useRef(true);
+  showIntroRef.current = showIntro;
   const gameRef = useRef({});
   const scoreRef = useRef(0);
   const gameOverRef = useRef(false);
@@ -205,7 +209,7 @@ export default function DinoGame() {
   }, [submitScore]);
 
   const jump = useCallback(() => {
-    if (gameOverRef.current) return;
+    if (gameOverRef.current || showIntroRef.current) return;
     const game = gameRef.current;
     if (!startedRef.current) {
       startGame();
@@ -410,8 +414,9 @@ export default function DinoGame() {
   }, [handleGameEnd, gameId]);
 
   useEffect(() => {
-    startGame();
-  }, [startGame]);
+    // بازی تا بسته شدن پاپ‌آپ تبلیغ/راهنما شروع نمی‌شود
+    if (!showIntro) startGame();
+  }, [showIntro, startGame]);
 
   return (
     <div className="game-page">
@@ -428,8 +433,6 @@ export default function DinoGame() {
         </div>
       </div>
 
-      <AdBanner slotKey="dino" />
-
       <div className="dino-container">
         <canvas
           ref={canvasRef}
@@ -440,6 +443,19 @@ export default function DinoGame() {
       </div>
 
        <div className="swipe-hint">Space یا ↑ برای پرش | ↓ برای خم شدن</div>
+
+      {showIntro && (
+        <AdModal
+          title="دایناسور"
+          instructions={[
+            "Space یا کلید ↑ برای پرش",
+            "کلید ↓ برای خم شدن زیر موانع هوایی",
+            "سرعت بازی به‌مرور بیشتر می‌شود",
+            "برخورد با موانع = پایان بازی",
+          ]}
+          onClose={() => setShowIntro(false)}
+        />
+      )}
 
       <TouchControls
         type="dino"
