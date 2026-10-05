@@ -109,26 +109,34 @@ class AvatarController {
 
 // بارگذاری و ساخت یک آواتار از روی شناسه. هر نمونه‌ی مدل با cloneSkeleton
 // کپی می‌شود تا اشتراک‌گذاری اشتباه SkinnedMesh بین نمونه‌های هم‌ریگ اتفاق نیفتد.
-// نمونه‌ی بارگذاری‌شده مقیاس‌شده، روی زمین (y=0) قرار گرفته و مجهز به انیمیشن می‌شود.
+// مدل‌های GLB این مجموعه رو به +Z هستند؛ با چرخش π روی مدل (داخل گروه ریشه) صورت
+// به سمت محلی -Z می‌آید تا با فرض کدِ حرکت/دوربین (چهره در -Z) هماهنگ شود و در
+// نمای سوم‌شخص پشت کاراکتر به سمت بیننده قرار گیرد.
+function buildAvatarRoot(gltf, def) {
+  const model = cloneSkeleton(gltf.scene);
+  model.scale.setScalar(SCALE);
+  model.rotation.y = Math.PI;
+  const root = new THREE.Group();
+  root.add(model);
+  root.position.y = 0;
+  root.userData.model = model;
+  root.userData.avatarDef = def;
+  return { root, model };
+}
+
 export async function loadAvatar(id) {
   const def = getAvatarDef(id);
   const gltf = await loader.loadAsync(def.path);
-  const model = cloneSkeleton(gltf.scene);
-  model.scale.setScalar(SCALE);
-  model.position.y = 0;
-  model.userData.avatarDef = def;
-  return model;
+  const { root } = buildAvatarRoot(gltf, def);
+  return root;
 }
 
 export async function loadAvatarWithAnimation(id) {
   const def = getAvatarDef(id);
   const gltf = await loader.loadAsync(def.path);
-  const model = cloneSkeleton(gltf.scene);
-  model.scale.setScalar(SCALE);
-  model.position.y = 0;
+  const { root, model } = buildAvatarRoot(gltf, def);
   const controller = new AvatarController(model, gltf);
-  model.userData.avatarDef = def;
-  return { model, controller };
+  return { model: root, controller };
 }
 
 // سازگاری برای کدهای قدیمی که به صورت همزمان آواتار می‌ساختند: ইনترفیس جدید

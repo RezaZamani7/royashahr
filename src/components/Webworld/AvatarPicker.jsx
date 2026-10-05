@@ -28,7 +28,7 @@ async function renderAvatarToDataUrl(id) {
   const size = box.getSize(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z) || 1;
   const dist = (maxDim / 2 / Math.tan((45 * Math.PI) / 360)) * 1.15;
-  camera.position.set(center.x, center.y, center.z + dist);
+  camera.position.set(center.x, center.y, center.z - dist);
   camera.lookAt(center.x, center.y, center.z);
 
   renderer.render(scene, camera);
