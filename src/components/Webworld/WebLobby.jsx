@@ -9,6 +9,11 @@ import AvatarPicker from "./AvatarPicker";
 import BrowserModal from "./BrowserModal";
 
 const SPEED = 10;
+// کنترل سبک تانکی/سوم‌شخص (شبیه GTA)
+const TURN_SPEED = 2.6; // رادیان بر ثانیه — چرخش درجا با کلیدهای چپ/راست
+const CAM_DIST = 7;
+const CAM_HEIGHT = 3.8;
+const CAM_LERP = 6; // نرمی چرخش دوربین
 const PLAYER_RADIUS = 0.5;
 const WORLD_HALF = 150;
 
@@ -126,8 +131,11 @@ export default function WebLobby() {
     const clock = new THREE.Clock();
     clock.start();
     let raf;
-    const camPos = new THREE.Vector3();
-    const collidePoint = new THREE.Vector3();
+    // زاویه مداری دوربین دور کاراکتر (نرم‌سازی شده) و نقاط کمکی دوربین
+    let camAz = 0;
+    const camDesired = new THREE.Vector3();
+    const camLookTarget = new THREE.Vector3(0, 1.2, 0);
+    const camLook = new THREE.Vector3();
 
     const collide = (x, z) => {
       for (const c of city.colliders) {
@@ -151,25 +159,45 @@ export default function WebLobby() {
       const keys = inputRef.current.keys;
       const joy = inputRef.current.joy;
 
-      let ix = joy.x;
-      let iz = joy.z;
-      if (keys.has("w") || keys.has("ArrowUp")) iz += 1;
-      if (keys.has("s") || keys.has("ArrowDown")) iz -= 1;
-      if (keys.has("a") || keys.has("ArrowLeft")) ix -= 1;
-      if (keys.has("d") || keys.has("ArrowRight")) ix += 1;
-
       if (!player) return;
 
-      let len = Math.hypot(ix, iz);
-      const moving = len > 0;
+      // ----- ورودی سبک تانکی (شبیه GTA) -----
+      // گاز: جلو مثبت / عقب منفی؛ فرمان: راست مثبت
+      let thrust = joy.z;
+      if (keys.has("w") || keys.has("ArrowUp")) thrust += 1;
+      if (keys.has("s") || keys.has("ArrowDown")) thrust -= 1;
+      thrust = Math.max(-1, Math.min(1, thrust));
+
+      let steer = joy.x;
+      if (keys.has("d") || keys.has("ArrowRight")) steer += 1;
+      if (keys.has("a") || keys.has("ArrowLeft")) steer -= 1;
+      steer = Math.max(-1, Math.min(1, steer));
+
       const now = clock.getElapsedTime();
       const jumping = jumpUntil > now;
+      const reversing = thrust < -0.05;
+
+      // ----- چرخش کاراکتر -----
+      if (reversing) {
+        // عقب: کاراکتر نرم برمی‌گردد رو به دوربین؛ دوربین همزمان عقب می‌رود
+        const targetHeading = camAz + Math.PI;
+        let diff = targetHeading - player.rotation.y;
+        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        player.rotation.y += diff * Math.min(1, dt * 8);
+      } else if (steer !== 0) {
+        // فرمان: چرخش درجا؛ نگه داشتن کلید = چرخش ممتد، رها کردن = توقف در جهت جدید
+        player.rotation.y -= steer * TURN_SPEED * dt;
+      }
+
+      // ----- حرکت در جهت فعلی کاراکتر -----
+      const heading = player.rotation.y;
+      const fwdX = -Math.sin(heading);
+      const fwdZ = -Math.cos(heading);
+      const moveSpeed = SPEED * Math.abs(thrust);
+      const moving = moveSpeed > 0;
       if (moving) {
-        ix /= len;
-        iz /= len;
-        const moveAngle = Math.atan2(ix, iz);
-        let nx = player.position.x + ix * SPEED * dt;
-        let nz = player.position.z + iz * SPEED * dt;
+        let nx = player.position.x + fwdX * moveSpeed * dt;
+        let nz = player.position.z + fwdZ * moveSpeed * dt;
         nx = Math.max(-WORLD_HALF, Math.min(WORLD_HALF, nx));
         nz = Math.max(-WORLD_HALF, Math.min(WORLD_HALF, nz));
         const col = collide(nx, nz);
@@ -177,23 +205,42 @@ export default function WebLobby() {
           player.position.x = nx;
           player.position.z = nz;
         } else if (col.axis === "x") {
-          if (col.penX > 0) player.position.x = ix > 0 ? nx - col.penX : nx + col.penX;
+          if (col.penX > 0) player.position.x = fwdX > 0 ? nx - col.penX : nx + col.penX;
           player.position.z = nz;
         } else {
           player.position.x = nx;
-          player.position.z = iz > 0 ? nz - col.penZ : nz + col.penZ;
+          player.position.z = fwdZ > 0 ? nz - col.penZ : nz + col.penZ;
         }
-        // جهت محلی چهره‌ی کاراکتر -Z است؛ پس برای هم‌جهت شدن با حرکت باید π چرخانده شود
-        const targetRot = moveAngle + Math.PI;
-        let cur = player.rotation.y;
-        let diff = targetRot - cur;
-        diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-        player.rotation.y = cur + diff * Math.min(1, dt * 14);
       }
 
-      // انتخاب حالت انیمیشن از طریق AnimationMixer با انتقال نرم
+      // ----- دوربین دنبال‌کننده نرم (بدون پرش زاویه) -----
+      if (camModeRef.current === "third") {
+        if (!reversing) {
+          // حالت عادی: دوربین پشت کاراکتر و هم‌جهت با چرخش او
+          let diff = player.rotation.y - camAz;
+          diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+          camAz += diff * Math.min(1, dt * CAM_LERP);
+        }
+        // در حالت عقب زاویه دوربین ثابت می‌ماند و صرفاً عقب می‌رود تا صورت دیده شود
+        camDesired.set(
+          player.position.x + Math.sin(camAz) * CAM_DIST,
+          CAM_HEIGHT,
+          player.position.z + Math.cos(camAz) * CAM_DIST
+        );
+        camera.position.lerp(camDesired, Math.min(1, dt * 8));
+        camLook.set(player.position.x, 1.2, player.position.z);
+        camLookTarget.lerp(camLook, Math.min(1, dt * 10));
+        camera.lookAt(camLookTarget);
+      } else {
+        // اول شخص: دوربین در چشم کاراکتر و در جهت نگاه او
+        camera.position.set(player.position.x, 1.45, player.position.z);
+        camera.lookAt(player.position.x + fwdX * 10, 1.3, player.position.z + fwdZ * 10);
+      }
+
+      // ----- انتخاب حالت انیمیشن با انتقال نرم -----
       if (jumping) avatarControllerRef?.setState("jump");
-      else if (moving) avatarControllerRef?.setState(len > 0.6 ? "run" : "walk");
+      else if (moving) avatarControllerRef?.setState(Math.abs(thrust) > 0.6 ? "run" : "walk");
+      else if (steer !== 0) avatarControllerRef?.setState("walk"); // چرخش درجا با گام
       else avatarControllerRef?.setState("idle");
       if (avatarControllerRef) avatarControllerRef.update(dt);
 
@@ -208,26 +255,6 @@ export default function WebLobby() {
       if ((newAction?.type) !== (actionRef.current?.type)) {
         actionRef.current = newAction;
         setAction(newAction);
-      }
-
-      // جهت رو به روی کاراکتر (با توجه به اینکه محلی چهره -Z است)
-      const fwdX = -Math.sin(player.rotation.y);
-      const fwdZ = -Math.cos(player.rotation.y);
-      if (camModeRef.current === "first") {
-        camPos.set(player.position.x, 1.45, player.position.z);
-        camera.position.copy(camPos);
-        camera.lookAt(player.position.x + fwdX * 10, 1.3, player.position.z + fwdZ * 10);
-      } else {
-        // دوربین پشت کاراکتر و هم‌زمان با چرخش او حرکت می‌کند
-        const dist = 7;
-        const height = 3.8;
-        camPos.set(
-          player.position.x - fwdX * dist,
-          height,
-          player.position.z - fwdZ * dist
-        );
-        camera.position.copy(camPos);
-        camera.lookAt(player.position.x, 1.2, player.position.z);
       }
 
       renderer.render(scene, camera);
