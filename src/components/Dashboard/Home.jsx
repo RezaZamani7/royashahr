@@ -32,6 +32,14 @@ const BUILDINGS = [
     type: "url",
     src: "https://irannationalmuseum.ir/Virtula-Tour/National%20Museum%20Virtual%20Tour.html",
   },
+  {
+    id: "shop",
+    icon: "🛍️",
+    title: "ساختمان خرید",
+    desc: "فروشگاه آنلاین دیجی‌کالا",
+    type: "url",
+    src: "https://www.digikala.com/",
+  },
 ];
 
 export default function Home() {
