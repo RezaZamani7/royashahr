@@ -1,6 +1,6 @@
-// پنجره‌ی مرورگر داخلی: یک iframe که فقط صفحات همین سایت را باز می‌کند تا
-// کاربر بدون خروج از فضای سه‌بعدی، داخل سایت بماند.
-export default function BrowserModal({ title, src, onClose }) {
+// پنجره‌ی مرورگر داخلی: یک iframe که صفحات (داخلی یا خارجی) را بدون خروج از
+// صفحه‌ی فعلی باز می‌کند.
+export default function BrowserModal({ title, src, onClose, backLabel = "بازگشت به شهر" }) {
   return (
     <div className="browser-modal-overlay" onClick={onClose}>
       <div className="browser-modal" onClick={(e) => e.stopPropagation()}>
@@ -8,7 +8,7 @@ export default function BrowserModal({ title, src, onClose }) {
           <span className="browser-modal-title">{title}</span>
           <div className="browser-modal-actions">
             <button className="browser-back-btn" onClick={onClose}>
-              بازگشت به شهر
+              {backLabel}
             </button>
             <button className="browser-close-btn" onClick={onClose} aria-label="بستن">
               ✕
