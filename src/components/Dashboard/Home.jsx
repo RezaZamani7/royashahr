@@ -96,33 +96,6 @@ export default function Home() {
 
       <AdBanner slotKey="home" />
 
-      <div className="games-grid">
-        <div className="game-card" onClick={() => navigate("/game/2048")}>
-          <div className="game-icon">🎮</div>
-          <h3>۲۰۴۸</h3>
-          <p>بازی فکری اعداد</p>
-          {profile && <p className="best">بهترین: {profile.high_2048?.toLocaleString("fa-IR") || "۰"}</p>}
-        </div>
-        <div className="game-card" onClick={() => navigate("/game/tetris")}>
-          <div className="game-icon">🧩</div>
-          <h3>تتریس</h3>
-          <p>بازی کلاسیک بلوکی</p>
-          {profile && <p className="best">بهترین: {profile.high_tetris?.toLocaleString("fa-IR") || "۰"}</p>}
-        </div>
-        <div className="game-card" onClick={() => navigate("/game/dino")}>
-          <div className="game-icon">🦕</div>
-          <h3>دایناسور</h3>
-          <p>بازی دونده</p>
-          {profile && <p className="best">بهترین: {profile.high_dino?.toLocaleString("fa-IR") || "۰"}</p>}
-        </div>
-        <div className="game-card" onClick={() => navigate("/game/snake")}>
-          <div className="game-icon">🐍</div>
-          <h3>مار</h3>
-          <p>بازی کلاسیک مار</p>
-          {profile && <p className="best">بهترین: {profile.high_snake?.toLocaleString("fa-IR") || "۰"}</p>}
-        </div>
-      </div>
-
       {browser && (
         <BrowserModal
           title={browser.title}

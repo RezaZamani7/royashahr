@@ -29,8 +29,8 @@ export default function GameList() {
           </div>
         ))}
       </div>
-      <button className="btn-secondary" onClick={() => navigate("/world")}>
-        بازگشت به شهر
+      <button className="btn-secondary" onClick={() => navigate("/dashboard")}>
+        بازگشت به صفحه اصلی
       </button>
     </div>
   );
