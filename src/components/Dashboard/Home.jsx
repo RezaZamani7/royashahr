@@ -50,9 +50,8 @@ export default function Home() {
   const openBuilding = (b) => {
     if (b.type === "route") navigate(b.path);
     else if (b.type === "url") {
-      // سایت‌هایی مثل شاد اسکریپت ضد-iframe دارند (frame-busting).
-      // برای این سایت‌ها از تب جدید استفاده می‌شود؛ بقیه در مرورگر داخلی باز می‌شوند.
-      const frameBlockers = ["web.shad.ir"];
+      // سایت‌های خارجی در پنجره‌ی داخلی (iframe) باز می‌شوند.
+      const frameBlockers = [];
       const isBlocked = frameBlockers.some((h) => b.src.includes(h));
       if (isBlocked) {
         window.open(b.src, "_blank", "noopener,noreferrer");
