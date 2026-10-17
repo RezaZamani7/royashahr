@@ -214,6 +214,111 @@ export default function buildCity(scene) {
   gameDoor.position.set(gameX, 3, gameZ - gameD / 2 - 0.2);
   scene.add(gameDoor);
 
+  // ---------- ساختمان مدرسه (شاد) ----------
+  const schX = 85;
+  const schZ = 85;
+  const schW = 20;
+  const schD = 16;
+  const schH = 24;
+  const schBody = new THREE.Mesh(
+    new THREE.BoxGeometry(schW, schH, schD),
+    new THREE.MeshLambertMaterial({ color: 0x2563eb })
+  );
+  schBody.position.set(schX, schH / 2, schZ);
+  schBody.castShadow = true;
+  schBody.receiveShadow = true;
+  scene.add(schBody);
+  const schRoof = new THREE.Mesh(
+    new THREE.BoxGeometry(schW + 0.6, 1, schD + 0.6),
+    new THREE.MeshLambertMaterial({ color: 0x1e40af })
+  );
+  schRoof.position.set(schX, schH + 0.5, schZ);
+  scene.add(schRoof);
+  const schSignMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("ساختمان مدرسه (شاد)", { bg: "#2563eb", fg: "#ffffff" }),
+  });
+  const schSign = new THREE.Mesh(new THREE.PlaneGeometry(14, 3.5), schSignMat);
+  schSign.position.set(schX, schH + 2, schZ);
+  scene.add(schSign);
+  colliders.push({
+    min: { x: schX - schW / 2, z: schZ - schD / 2 },
+    max: { x: schX + schW / 2, z: schZ + schD / 2 },
+  });
+  const schDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
+  schDoor.position.set(schX - schW / 2 + 0.2, 3, schZ);
+  scene.add(schDoor);
+  const schoolZone = { x: schX - schW / 2 - 5, z: schZ, r: 7 };
+
+  // ---------- ساختمان موزه ----------
+  const musX = -85;
+  const musZ = 85;
+  const musW = 22;
+  const musD = 16;
+  const musH = 20;
+  const musBody = new THREE.Mesh(
+    new THREE.BoxGeometry(musW, musH, musD),
+    new THREE.MeshLambertMaterial({ color: 0x92400e })
+  );
+  musBody.position.set(musX, musH / 2, musZ);
+  musBody.castShadow = true;
+  musBody.receiveShadow = true;
+  scene.add(musBody);
+  const musRoof = new THREE.Mesh(
+    new THREE.BoxGeometry(musW + 0.6, 1, musD + 0.6),
+    new THREE.MeshLambertMaterial({ color: 0x78350f })
+  );
+  musRoof.position.set(musX, musH + 0.5, musZ);
+  scene.add(musRoof);
+  const musSignMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("موزه ملی", { bg: "#92400e", fg: "#ffffff" }),
+  });
+  const musSign = new THREE.Mesh(new THREE.PlaneGeometry(14, 3.5), musSignMat);
+  musSign.position.set(musX, musH + 2, musZ);
+  scene.add(musSign);
+  colliders.push({
+    min: { x: musX - musW / 2, z: musZ - musD / 2 },
+    max: { x: musX + musW / 2, z: musZ + musD / 2 },
+  });
+  const musDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
+  musDoor.position.set(musX + musW / 2 - 0.2, 3, musZ);
+  scene.add(musDoor);
+  const museumZone = { x: musX + musW / 2 + 5, z: musZ, r: 7 };
+
+  // ---------- ساختمان خرید ----------
+  const shpX = 85;
+  const shpZ = -85;
+  const shpW = 18;
+  const shpD = 16;
+  const shpH = 22;
+  const shpBody = new THREE.Mesh(
+    new THREE.BoxGeometry(shpW, shpH, shpD),
+    new THREE.MeshLambertMaterial({ color: 0xbe185d })
+  );
+  shpBody.position.set(shpX, shpH / 2, shpZ);
+  shpBody.castShadow = true;
+  shpBody.receiveShadow = true;
+  scene.add(shpBody);
+  const shpRoof = new THREE.Mesh(
+    new THREE.BoxGeometry(shpW + 0.6, 1, shpD + 0.6),
+    new THREE.MeshLambertMaterial({ color: 0x9d174d })
+  );
+  shpRoof.position.set(shpX, shpH + 0.5, shpZ);
+  scene.add(shpRoof);
+  const shpSignMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("ساختمان خرید", { bg: "#be185d", fg: "#ffffff" }),
+  });
+  const shpSign = new THREE.Mesh(new THREE.PlaneGeometry(14, 3.5), shpSignMat);
+  shpSign.position.set(shpX, shpH + 2, shpZ);
+  scene.add(shpSign);
+  colliders.push({
+    min: { x: shpX - shpW / 2, z: shpZ - shpD / 2 },
+    max: { x: shpX + shpW / 2, z: shpZ + shpD / 2 },
+  });
+  const shpDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
+  shpDoor.position.set(shpX - shpW / 2 + 0.2, 3, shpZ);
+  scene.add(shpDoor);
+  const shopZone = { x: shpX - shpW / 2 - 5, z: shpZ, r: 7 };
+
   // ---------- درخت‌ها و چراغ‌ها ----------
   const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6b4226 });
   const leafMat = new THREE.MeshLambertMaterial({ color: 0x2f9e44 });
@@ -229,5 +334,5 @@ export default function buildCity(scene) {
     scene.add(t, lf);
   }
 
-  return { colliders, managementZone, gamesZone, spawn: { x: 0, z: 0 } };
+  return { colliders, managementZone, gamesZone, schoolZone, museumZone, shopZone, spawn: { x: 0, z: 0 } };
 }

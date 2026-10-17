@@ -251,6 +251,12 @@ export default function WebLobby() {
         newAction = { type: "management" };
       } else if (Math.hypot(px - city.gamesZone.x, pz - city.gamesZone.z) < city.gamesZone.r) {
         newAction = { type: "games" };
+      } else if (Math.hypot(px - city.schoolZone.x, pz - city.schoolZone.z) < city.schoolZone.r) {
+        newAction = { type: "school" };
+      } else if (Math.hypot(px - city.museumZone.x, pz - city.museumZone.z) < city.museumZone.r) {
+        newAction = { type: "museum" };
+      } else if (Math.hypot(px - city.shopZone.x, pz - city.shopZone.z) < city.shopZone.r) {
+        newAction = { type: "shop" };
       }
       if ((newAction?.type) !== (actionRef.current?.type)) {
         actionRef.current = newAction;
@@ -310,6 +316,21 @@ export default function WebLobby() {
     setBrowser({ title: "لیست بازی‌ها", src: "/games" });
   };
 
+  const openSchool = () => {
+    setBrowser({ title: "ساختمان مدرسه (شاد)", src: "https://web.shad.ir/" });
+  };
+
+  const openMuseum = () => {
+    setBrowser({
+      title: "موزه ملی",
+      src: "https://irannationalmuseum.ir/Virtula-Tour/National%20Museum%20Virtual%20Tour.html",
+    });
+  };
+
+  const openShop = () => {
+    setBrowser({ title: "ساختمان خرید", src: "https://www.digikala.com/" });
+  };
+
   return (
     <div className="weblobby">
       <div className="world-canvas" ref={containerRef} />
@@ -363,6 +384,30 @@ export default function WebLobby() {
               <p className="world-action-title">ساختمان بازی</p>
               <button className="world-enter-btn" onClick={openGames}>
                 ورود به ساختمان بازی
+              </button>
+            </>
+          )}
+          {action.type === "school" && (
+            <>
+              <p className="world-action-title">ساختمان مدرسه (شاد)</p>
+              <button className="world-enter-btn" onClick={openSchool}>
+                ورود به سامانه شاد
+              </button>
+            </>
+          )}
+          {action.type === "museum" && (
+            <>
+              <p className="world-action-title">موزه ملی</p>
+              <button className="world-enter-btn" onClick={openMuseum}>
+                ورود به تور مجازی موزه
+              </button>
+            </>
+          )}
+          {action.type === "shop" && (
+            <>
+              <p className="world-action-title">ساختمان خرید</p>
+              <button className="world-enter-btn" onClick={openShop}>
+                ورود به فروشگاه
               </button>
             </>
           )}
