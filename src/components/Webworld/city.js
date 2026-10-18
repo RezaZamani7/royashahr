@@ -73,8 +73,8 @@ export default function buildCity(scene) {
     (gltf) => {
       const model = gltf.scene;
       // مدل تقریباً ۶.۵ واحد عرض و ۰.۷۳ ارتفاع دارد؛ بدون تغییر مقیاس، اندازه مناسب است.
-      // پای مدل در y=-0.25 است؛ آن را بالا می‌بریم تا روی سطح میدان (y=0.03) بنشیند.
-      model.position.set(0, 0.03 - -0.25, 0);
+      // پای مدل در y=-0.25 است؛ آن را بالا می‌بریم تا دقیقاً روی سطح میدان (y=0.06) بنشیند.
+      model.position.set(0, 0.06 - -0.25, 0);
       model.castShadow = true;
       scene.add(model);
     },
@@ -85,15 +85,26 @@ export default function buildCity(scene) {
   );
 
   // ---------- خیابان‌ها ----------
+  // جاده‌ها به دو تکه شکسته شده‌اند تا از میدان عبور نکنند و z-fighting نداشته باشیم.
+  // میدان از x=±30 و z=±30 گسترده است؛ جاده‌ها از ±30 به بعد ادامه دارند.
   const roadMat = new THREE.MeshLambertMaterial({ color: 0x4b5563 });
-  const roadH = new THREE.Mesh(new THREE.BoxGeometry(WORLD, 0.06, 10), roadMat);
-  roadH.position.set(0, 0.03, 0);
-  roadH.receiveShadow = true;
-  scene.add(roadH);
-  const roadV = new THREE.Mesh(new THREE.BoxGeometry(10, 0.06, WORLD), roadMat);
-  roadV.position.set(0, 0.03, 0);
-  roadV.receiveShadow = true;
-  scene.add(roadV);
+  const roadLen = WORLD / 2 - 30; // 130 واحد: از ±30 تا ±160
+  const roadH1 = new THREE.Mesh(new THREE.BoxGeometry(roadLen, 0.06, 10), roadMat);
+  roadH1.position.set(-30 - roadLen / 2, 0.03, 0);
+  roadH1.receiveShadow = true;
+  scene.add(roadH1);
+  const roadH2 = new THREE.Mesh(new THREE.BoxGeometry(roadLen, 0.06, 10), roadMat);
+  roadH2.position.set(30 + roadLen / 2, 0.03, 0);
+  roadH2.receiveShadow = true;
+  scene.add(roadH2);
+  const roadV1 = new THREE.Mesh(new THREE.BoxGeometry(10, 0.06, roadLen), roadMat);
+  roadV1.position.set(0, 0.03, -30 - roadLen / 2);
+  roadV1.receiveShadow = true;
+  scene.add(roadV1);
+  const roadV2 = new THREE.Mesh(new THREE.BoxGeometry(10, 0.06, roadLen), roadMat);
+  roadV2.position.set(0, 0.03, 30 + roadLen / 2);
+  roadV2.receiveShadow = true;
+  scene.add(roadV2);
 
   // ---------- ساختمان‌های معمولی (بلوک‌های شهر) ----------
   const palette = [0x64748b, 0x94a3b8, 0x78716c, 0x8a7b6a, 0x9ca3af, 0x6b7280, 0x7c6e5f];
