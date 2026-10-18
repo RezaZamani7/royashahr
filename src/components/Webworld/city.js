@@ -45,11 +45,12 @@ export default function buildCity(scene) {
   scene.add(ground);
 
   // ---------- میدان اصلی (سنگ‌فرش) ----------
+  // ضخامت مثل خیابان‌ها (۰.۰۶) است تا کاراکتر داخل آن فرو نرود و همه سطوح هم‌تراز باشند.
   const plaza = new THREE.Mesh(
-    new THREE.BoxGeometry(60, 0.3, 60),
+    new THREE.BoxGeometry(60, 0.06, 60),
     new THREE.MeshLambertMaterial({ color: 0x9aa3ad })
   );
-  plaza.position.set(0, 0.15, 0);
+  plaza.position.set(0, 0.03, 0);
   plaza.receiveShadow = true;
   scene.add(plaza);
 
@@ -60,27 +61,26 @@ export default function buildCity(scene) {
     colliders.push({ min: { x: dx - 0.5, z: dz - 0.5 }, max: { x: dx + 0.5, z: dz + 0.5 } });
   }
 
-  // ---------- مجسمه/آبنما وسط میدان ----------
-  // مدل سه‌بعدی abnama.glb جایگزین فواره قبلی می‌شود. کولایدر هم‌زمان (هم‌گام)
+  // ---------- آبنما وسط میدان ----------
+  // مدل سه‌بعدی fountain_model.glb جایگزین فواره قبلی می‌شود. کولایدر هم‌زمان (هم‌گام)
   // اضافه می‌شود تا کاراکتر حتی قبل از بارگذاری مدل هم نتواند از آن رد شود.
-  const modelScale = 4;
-  const halfFoot = 1.6; // نیمی از پهنای پای مدل (پس از مقیاس) برای کولایدر مربعی
+  const halfFoot = 3.4; // نیمی از پهنای پای مدل برای کولایدر مربعی
   colliders.push({ min: { x: -halfFoot, z: -halfFoot }, max: { x: halfFoot, z: halfFoot } });
 
-  const abLoader = new GLTFLoader();
-  abLoader.load(
-    "/3d Objects/abnama.glb",
+  const fountainLoader = new GLTFLoader();
+  fountainLoader.load(
+    "/3d Objects/fountain_model.glb",
     (gltf) => {
       const model = gltf.scene;
-      model.scale.setScalar(modelScale);
-      // مدل دور محور y متقارن است؛ آن را بالا می‌بریم تا کف مدل روی زمین (y=0) قرار گیرد.
-      model.position.set(0, modelScale * 0.455, 0);
+      // مدل تقریباً ۶.۵ واحد عرض و ۰.۷۳ ارتفاع دارد؛ بدون تغییر مقیاس، اندازه مناسب است.
+      // پای مدل در y=-0.25 است؛ آن را بالا می‌بریم تا روی سطح میدان (y=0.03) بنشیند.
+      model.position.set(0, 0.03 - -0.25, 0);
       model.castShadow = true;
       scene.add(model);
     },
     undefined,
     (err) => {
-      console.error("[city] بارگذاری abnama.glb ناموفق بود:", err);
+      console.error("[city] بارگذاری fountain_model.glb ناموفق بود:", err);
     }
   );
 
