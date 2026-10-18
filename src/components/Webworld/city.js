@@ -86,9 +86,8 @@ export default function buildCity(scene) {
 
   // ---------- خیابان‌ها ----------
   // جاده‌ها به دو تکه شکسته شده‌اند تا از میدان عبور نکنند و z-fighting نداشته باشیم.
-  // میدان از x=±30 و z=±30 گسترده است؛ جاده‌ها از ±30 به بعد ادامه دارند.
   const roadMat = new THREE.MeshLambertMaterial({ color: 0x4b5563 });
-  const roadLen = WORLD / 2 - 30; // 130 واحد: از ±30 تا ±160
+  const roadLen = WORLD / 2 - 30;
   const roadH1 = new THREE.Mesh(new THREE.BoxGeometry(roadLen, 0.06, 10), roadMat);
   roadH1.position.set(-30 - roadLen / 2, 0.03, 0);
   roadH1.receiveShadow = true;
@@ -106,63 +105,9 @@ export default function buildCity(scene) {
   roadV2.receiveShadow = true;
   scene.add(roadV2);
 
-  // ---------- ساختمان‌های معمولی (بلوک‌های شهر) ----------
-  const palette = [0x64748b, 0x94a3b8, 0x78716c, 0x8a7b6a, 0x9ca3af, 0x6b7280, 0x7c6e5f];
-  const roofPalette = [0x3f4a45, 0x4a5d52, 0x55503f];
-  const occupied = []; // نواحی اشغال نشده توسط میدان و شاخص‌ها
-
-  // محل ساختمان‌ها در دو طرف خیابان‌ها، در فاصله از میدان
-  const offsets = [-85, -55, -20, 20, 55, 85]; // فاصله از مرکز در امتداد هر خیابان
-  const sides = [12, 26, 40]; // فاصله عمودی از خط خیابان
-
-  for (const off of offsets) {
-    for (const side of sides) {
-      for (const dir of [1, -1]) {
-        // ساختمان در امتداد خیابان افقی (محور x)
-        const bx = off + (Math.random() - 0.5) * 6;
-        const bz = side * dir + (Math.random() - 0.5) * 5;
-        if (Math.abs(bx) > 55 || Math.abs(bz) < 12 || Math.abs(bz) > 95) continue;
-        addBlock(bx, bz);
-
-        // ساختمان در امتداد خیابان عمودی (محور z) — یک بلوک در هر مجاورت
-        const bx2 = side * dir + (Math.random() - 0.5) * 5;
-        const bz2 = off + (Math.random() - 0.5) * 6;
-        if (Math.abs(bz2) > 55 || Math.abs(bx2) < 12 || Math.abs(bx2) > 95) continue;
-        addBlock(bx2, bz2);
-      }
-    }
-  }
-
-  function addBlock(x, z) {
-    const w = 8 + Math.random() * 8;
-    const d = 8 + Math.random() * 8;
-    const h = 6 + Math.random() * 12;
-    const bw = Math.round(w);
-    const bd = Math.round(d);
-    // محدودیت به داخل محدوده شهر
-    if (Math.abs(x) + bw / 2 > 150 || Math.abs(z) + bd / 2 > 150) return;
-    const color = palette[Math.floor(Math.random() * palette.length)];
-    const roof = roofPalette[Math.floor(Math.random() * roofPalette.length)];
-
-    const mesh = buildingBox(bw, h, bd, color, x, z);
-    scene.add(mesh);
-    const roofTop = new THREE.Mesh(
-      new THREE.BoxGeometry(bw + 0.4, 0.6, bd + 0.4),
-      new THREE.MeshLambertMaterial({ color: roof })
-    );
-    roofTop.position.set(x, h + 0.3, z);
-    scene.add(roofTop);
-
-    colliders.push({
-      min: { x: x - bw / 2, z: z - bd / 2 },
-      max: { x: x + bw / 2, z: z + bd / 2 },
-    });
-    occupied.push({ x, z, r: Math.max(bw, bd) / 2 + 2 });
-  }
-
   // ---------- ساختمان مدیریت (شاخص ۱) ----------
   const mgmtX = 0;
-  const mgmtZ = -70; // سمت جنوب میدان
+  const mgmtZ = -70;
   const mgmtW = 20;
   const mgmtD = 16;
   const mgmtH = 30;
@@ -179,7 +124,6 @@ export default function buildCity(scene) {
   mgmtRoof.position.set(mgmtX, mgmtH + 0.5, mgmtZ);
   scene.add(mgmtRoof);
 
-  // تابلو «مدیریت»
   const signMat = new THREE.MeshBasicMaterial({
     map: makeTextTexture("ساختمان مدیریت", { bg: "#1d4ed8", fg: "#ffffff" }),
   });
@@ -193,15 +137,23 @@ export default function buildCity(scene) {
   });
   const managementZone = { x: mgmtX, z: mgmtZ + mgmtD / 2 + 5, r: 6 };
 
-  // درب مدیریت (در سمت رو به میدان)
   const doorMat = new THREE.MeshLambertMaterial({ color: 0x111827 });
-  const mgmtDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
-  mgmtDoor.position.set(mgmtX, 3, mgmtZ + mgmtD / 2 + 0.2);
+  const mgmtDoorMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("مدیریت", { bg: "#4a3728", fg: "#d4a574", w: 256, h: 320, size: 38 }),
+  });
+  const mgmtDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 5), mgmtDoorMat);
+  mgmtDoor.position.set(mgmtX, 3.5, mgmtZ + mgmtD / 2 + 0.01);
   scene.add(mgmtDoor);
+  const mgmtDoorSign = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("مدیریت", { bg: "#1d4ed8", fg: "#ffffff", w: 256, h: 64, size: 28 }),
+  });
+  const mgmtDoorSignMesh = new THREE.Mesh(new THREE.PlaneGeometry(4, 1), mgmtDoorSign);
+  mgmtDoorSignMesh.position.set(mgmtX, 6.8, mgmtZ + mgmtD / 2 + 0.01);
+  scene.add(mgmtDoorSignMesh);
 
   // ---------- ساختمان بازی (شاخص ۲) ----------
   const gameX = 0;
-  const gameZ = 70; // سمت شمال میدان
+  const gameZ = 70;
   const gameW = 22;
   const gameD = 18;
   const gameH = 26;
@@ -231,9 +183,18 @@ export default function buildCity(scene) {
   });
   const gamesZone = { x: gameX, z: gameZ - gameD / 2 - 5, r: 6 };
 
-  const gameDoor = new THREE.Mesh(new THREE.BoxGeometry(6, 6, 0.3), doorMat);
-  gameDoor.position.set(gameX, 3, gameZ - gameD / 2 - 0.2);
+  const gameDoorMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("بازی", { bg: "#134e4a", fg: "#5eead4", w: 256, h: 320, size: 38 }),
+  });
+  const gameDoor = new THREE.Mesh(new THREE.PlaneGeometry(5, 6), gameDoorMat);
+  gameDoor.position.set(gameX, 3.5, gameZ - gameD / 2 - 0.01);
   scene.add(gameDoor);
+  const gameDoorSign = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("ساختمان بازی", { bg: "#0f766e", fg: "#ffffff", w: 256, h: 64, size: 28 }),
+  });
+  const gameDoorSignMesh = new THREE.Mesh(new THREE.PlaneGeometry(5, 1.2), gameDoorSign);
+  gameDoorSignMesh.position.set(gameX, 7, gameZ - gameD / 2 - 0.01);
+  scene.add(gameDoorSignMesh);
 
   // ---------- ساختمان مدرسه (شاد) ----------
   const schX = 85;
@@ -265,10 +226,20 @@ export default function buildCity(scene) {
     min: { x: schX - schW / 2, z: schZ - schD / 2 },
     max: { x: schX + schW / 2, z: schZ + schD / 2 },
   });
-  const schDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
-  schDoor.position.set(schX - schW / 2 + 0.2, 3, schZ);
-  scene.add(schDoor);
   const schoolZone = { x: schX - schW / 2 - 5, z: schZ, r: 7 };
+
+  const schDoorMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("شاد", { bg: "#1e40af", fg: "#93c5fd", w: 256, h: 320, size: 38 }),
+  });
+  const schDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 5), schDoorMat);
+  schDoor.position.set(schX - schW / 2 - 0.01, 3.5, schZ);
+  scene.add(schDoor);
+  const schDoorSign = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("ورود به شاد", { bg: "#2563eb", fg: "#ffffff", w: 256, h: 64, size: 28 }),
+  });
+  const schDoorSignMesh = new THREE.Mesh(new THREE.PlaneGeometry(4, 1), schDoorSign);
+  schDoorSignMesh.position.set(schX - schW / 2 - 0.01, 6.8, schZ);
+  scene.add(schDoorSignMesh);
 
   // ---------- ساختمان موزه ----------
   const musX = -85;
@@ -300,10 +271,20 @@ export default function buildCity(scene) {
     min: { x: musX - musW / 2, z: musZ - musD / 2 },
     max: { x: musX + musW / 2, z: musZ + musD / 2 },
   });
-  const musDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
-  musDoor.position.set(musX + musW / 2 - 0.2, 3, musZ);
-  scene.add(musDoor);
   const museumZone = { x: musX + musW / 2 + 5, z: musZ, r: 7 };
+
+  const musDoorMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("موزه", { bg: "#78350f", fg: "#fde68a", w: 256, h: 320, size: 38 }),
+  });
+  const musDoor = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 5), musDoorMat);
+  musDoor.position.set(musX + musW / 2 + 0.01, 3.5, musZ);
+  scene.add(musDoor);
+  const musDoorSign = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("موزه ملی", { bg: "#92400e", fg: "#ffffff", w: 256, h: 64, size: 28 }),
+  });
+  const musDoorSignMesh = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 1), musDoorSign);
+  musDoorSignMesh.position.set(musX + musW / 2 + 0.01, 6.8, musZ);
+  scene.add(musDoorSignMesh);
 
   // ---------- ساختمان خرید ----------
   const shpX = 85;
@@ -335,10 +316,20 @@ export default function buildCity(scene) {
     min: { x: shpX - shpW / 2, z: shpZ - shpD / 2 },
     max: { x: shpX + shpW / 2, z: shpZ + shpD / 2 },
   });
-  const shpDoor = new THREE.Mesh(new THREE.BoxGeometry(5, 6, 0.3), doorMat);
-  shpDoor.position.set(shpX - shpW / 2 + 0.2, 3, shpZ);
-  scene.add(shpDoor);
   const shopZone = { x: shpX - shpW / 2 - 5, z: shpZ, r: 7 };
+
+  const shpDoorMat = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("خرید", { bg: "#9d174d", fg: "#fbcfe8", w: 256, h: 320, size: 38 }),
+  });
+  const shpDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 5), shpDoorMat);
+  shpDoor.position.set(shpX - shpW / 2 - 0.01, 3.5, shpZ);
+  scene.add(shpDoor);
+  const shpDoorSign = new THREE.MeshBasicMaterial({
+    map: makeTextTexture("ورود به فروشگاه", { bg: "#be185d", fg: "#ffffff", w: 256, h: 64, size: 28 }),
+  });
+  const shpDoorSignMesh = new THREE.Mesh(new THREE.PlaneGeometry(4, 1), shpDoorSign);
+  shpDoorSignMesh.position.set(shpX - shpW / 2 - 0.01, 6.8, shpZ);
+  scene.add(shpDoorSignMesh);
 
   // ---------- درخت‌ها و چراغ‌ها ----------
   const trunkMat = new THREE.MeshLambertMaterial({ color: 0x6b4226 });
@@ -355,5 +346,5 @@ export default function buildCity(scene) {
     scene.add(t, lf);
   }
 
-  return { colliders, managementZone, gamesZone, schoolZone, museumZone, shopZone, spawn: { x: 0, z: 0 } };
+  return { colliders, managementZone, gamesZone, schoolZone, museumZone, shopZone, spawn: { x: 0, z: 22 } };
 }
