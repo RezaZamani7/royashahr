@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 function makeTextTexture(text, { bg = "#334155", fg = "#ffffff", w = 512, h = 128, size = 46 } = {}) {
   const canvas = document.createElement("canvas");
@@ -59,20 +60,29 @@ export default function buildCity(scene) {
     colliders.push({ min: { x: dx - 0.5, z: dz - 0.5 }, max: { x: dx + 0.5, z: dz + 0.5 } });
   }
 
-  // فواره/مجسمه وسط میدان
-  const fountain = new THREE.Mesh(
-    new THREE.CylinderGeometry(3, 3.4, 0.8, 24),
-    new THREE.MeshLambertMaterial({ color: 0x0ea5e9 })
+  // ---------- مجسمه/آبنما وسط میدان ----------
+  // مدل سه‌بعدی abnama.glb جایگزین فواره قبلی می‌شود. کولایدر هم‌زمان (هم‌گام)
+  // اضافه می‌شود تا کاراکتر حتی قبل از بارگذاری مدل هم نتواند از آن رد شود.
+  const modelScale = 4;
+  const halfFoot = 1.6; // نیمی از پهنای پای مدل (پس از مقیاس) برای کولایدر مربعی
+  colliders.push({ min: { x: -halfFoot, z: -halfFoot }, max: { x: halfFoot, z: halfFoot } });
+
+  const abLoader = new GLTFLoader();
+  abLoader.load(
+    "/3d Objects/abnama.glb",
+    (gltf) => {
+      const model = gltf.scene;
+      model.scale.setScalar(modelScale);
+      // مدل دور محور y متقارن است؛ آن را بالا می‌بریم تا کف مدل روی زمین (y=0) قرار گیرد.
+      model.position.set(0, modelScale * 0.455, 0);
+      model.castShadow = true;
+      scene.add(model);
+    },
+    undefined,
+    (err) => {
+      console.error("[city] بارگذاری abnama.glb ناموفق بود:", err);
+    }
   );
-  fountain.position.set(0, 0.4, 0);
-  fountain.castShadow = true;
-  scene.add(fountain);
-  const fountainTop = new THREE.Mesh(
-    new THREE.ConeGeometry(0.8, 1.4, 12),
-    new THREE.MeshLambertMaterial({ color: 0x38bdf8 })
-  );
-  fountainTop.position.set(0, 1.4, 0);
-  scene.add(fountainTop);
 
   // ---------- خیابان‌ها ----------
   const roadMat = new THREE.MeshLambertMaterial({ color: 0x4b5563 });
