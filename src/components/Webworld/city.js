@@ -108,8 +108,8 @@ export default function buildCity(scene) {
   // ---------- ساختمان مدیریت ----------
   const mgmtX = 0;
   const mgmtZ = -45;
-  const mgmtW = 20;
-  const mgmtD = 16;
+  const mgmtW = 10;
+  const mgmtD = 8;
   const mgmtH = 4;
   const mgmtMat = new THREE.MeshLambertMaterial({ color: 0x1d4ed8 });
   const mgmt = new THREE.Mesh(new THREE.BoxGeometry(mgmtW, mgmtH, mgmtD), mgmtMat);
@@ -149,8 +149,8 @@ export default function buildCity(scene) {
   // ---------- ساختمان بازی ----------
   const gameX = 0;
   const gameZ = 45;
-  const gameW = 22;
-  const gameD = 18;
+  const gameW = 11;
+  const gameD = 9;
   const gameH = 3.5;
   const gameMat = new THREE.MeshLambertMaterial({ color: 0x0f766e });
   const gameB = new THREE.Mesh(new THREE.BoxGeometry(gameW, gameH, gameD), gameMat);
@@ -190,8 +190,8 @@ export default function buildCity(scene) {
   // ---------- ساختمان مدرسه (شاد) ----------
   const schX = 55;
   const schZ = 55;
-  const schW = 20;
-  const schD = 16;
+  const schW = 10;
+  const schD = 8;
   const schH = 3;
   const schBody = new THREE.Mesh(
     new THREE.BoxGeometry(schW, schH, schD),
@@ -233,8 +233,8 @@ export default function buildCity(scene) {
   // ---------- ساختمان موزه ----------
   const musX = -55;
   const musZ = 55;
-  const musW = 22;
-  const musD = 16;
+  const musW = 11;
+  const musD = 8;
   const musH = 2.5;
   const musBody = new THREE.Mesh(
     new THREE.BoxGeometry(musW, musH, musD),
@@ -276,8 +276,8 @@ export default function buildCity(scene) {
   // ---------- ساختمان خرید ----------
   const shpX = 55;
   const shpZ = -55;
-  const shpW = 18;
-  const shpD = 16;
+  const shpW = 9;
+  const shpD = 8;
   const shpH = 3;
   const shpBody = new THREE.Mesh(
     new THREE.BoxGeometry(shpW, shpH, shpD),
