@@ -149,9 +149,9 @@ export default function buildCity(scene) {
   // ---------- ساختمان بازی ----------
   const gameX = 0;
   const gameZ = 45;
-  const gameW = 11;
-  const gameD = 9;
-  const gameH = 3.5;
+  const gameW = 10;
+  const gameD = 8;
+  const gameH = 4;
   const gameMat = new THREE.MeshLambertMaterial({ color: 0x0f766e });
   const gameB = new THREE.Mesh(new THREE.BoxGeometry(gameW, gameH, gameD), gameMat);
   gameB.position.set(gameX, gameH / 2, gameZ);
@@ -192,7 +192,7 @@ export default function buildCity(scene) {
   const schZ = 55;
   const schW = 10;
   const schD = 8;
-  const schH = 3;
+  const schH = 4;
   const schBody = new THREE.Mesh(
     new THREE.BoxGeometry(schW, schH, schD),
     new THREE.MeshLambertMaterial({ color: 0x2563eb })
@@ -220,22 +220,22 @@ export default function buildCity(scene) {
   const schoolZone = { x: schX - schW / 2 - 5, z: schZ, r: 7 };
 
   const schDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به شاد", { bg: "#60a5fa", fg: "#ffffff", w: 512, h: 640, size: 52 }) });
-  const schDoor = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 3), schDoorMat);
+  const schDoor = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.25), schDoorMat);
   schDoor.rotation.y = Math.PI / 2;
-  schDoor.position.set(schX - schW / 2 - 0.02, 1.75, schZ);
+  schDoor.position.set(schX - schW / 2 - 0.02, 2, schZ);
   scene.add(schDoor);
   const schDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("شاد", { bg: "#2563eb", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
-  const schDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.4), schDoorSignMat);
+  const schDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.4), schDoorSignMat);
   schDoorSign.rotation.y = Math.PI / 2;
-  schDoorSign.position.set(schX - schW / 2 - 0.02, 3.5, schZ);
+  schDoorSign.position.set(schX - schW / 2 - 0.02, 3.75, schZ);
   scene.add(schDoorSign);
 
   // ---------- ساختمان موزه ----------
   const musX = -55;
   const musZ = 55;
-  const musW = 11;
+  const musW = 10;
   const musD = 8;
-  const musH = 2.5;
+  const musH = 4;
   const musBody = new THREE.Mesh(
     new THREE.BoxGeometry(musW, musH, musD),
     new THREE.MeshLambertMaterial({ color: 0x92400e })
@@ -263,22 +263,22 @@ export default function buildCity(scene) {
   const museumZone = { x: musX + musW / 2 + 5, z: musZ, r: 7 };
 
   const musDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به موزه", { bg: "#f59e0b", fg: "#ffffff", w: 512, h: 640, size: 52 }) });
-  const musDoor = new THREE.Mesh(new THREE.PlaneGeometry(4.5, 2.75), musDoorMat);
+  const musDoor = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.25), musDoorMat);
   musDoor.rotation.y = -Math.PI / 2;
-  musDoor.position.set(musX + musW / 2 + 0.02, 1.5, musZ);
+  musDoor.position.set(musX + musW / 2 + 0.02, 2, musZ);
   scene.add(musDoor);
   const musDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("موزه", { bg: "#92400e", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
-  const musDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.4), musDoorSignMat);
+  const musDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.4), musDoorSignMat);
   musDoorSign.rotation.y = -Math.PI / 2;
-  musDoorSign.position.set(musX + musW / 2 + 0.02, 3.15, musZ);
+  musDoorSign.position.set(musX + musW / 2 + 0.02, 3.75, musZ);
   scene.add(musDoorSign);
 
   // ---------- ساختمان خرید ----------
   const shpX = 55;
   const shpZ = -55;
-  const shpW = 9;
+  const shpW = 10;
   const shpD = 8;
-  const shpH = 3;
+  const shpH = 4;
   const shpBody = new THREE.Mesh(
     new THREE.BoxGeometry(shpW, shpH, shpD),
     new THREE.MeshLambertMaterial({ color: 0xbe185d })
@@ -306,14 +306,14 @@ export default function buildCity(scene) {
   const shopZone = { x: shpX - shpW / 2 - 5, z: shpZ, r: 7 };
 
   const shpDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به فروشگاه", { bg: "#f472b6", fg: "#ffffff", w: 512, h: 640, size: 48 }) });
-  const shpDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 2.75), shpDoorMat);
+  const shpDoor = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.25), shpDoorMat);
   shpDoor.rotation.y = Math.PI / 2;
-  shpDoor.position.set(shpX - shpW / 2 - 0.02, 1.75, shpZ);
+  shpDoor.position.set(shpX - shpW / 2 - 0.02, 2, shpZ);
   scene.add(shpDoor);
   const shpDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("فروشگاه", { bg: "#be185d", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
-  const shpDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 0.4), shpDoorSignMat);
+  const shpDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.4), shpDoorSignMat);
   shpDoorSign.rotation.y = Math.PI / 2;
-  shpDoorSign.position.set(shpX - shpW / 2 - 0.02, 3.5, shpZ);
+  shpDoorSign.position.set(shpX - shpW / 2 - 0.02, 3.75, shpZ);
   scene.add(shpDoorSign);
 
   // ---------- درخت‌ها و چراغ‌ها ----------
