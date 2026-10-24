@@ -130,11 +130,11 @@ export default function buildCity(scene) {
   });
   const managementZone = { x: mgmtX, z: mgmtZ + mgmtD / 2 + 5, r: 6 };
 
-  const mgmtDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به مدیریت", { bg: "#3b82f6", fg: "#ffffff", w: 512, h: 640, size: 52 }) });
+  const mgmtDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به مدیریت", { bg: "#3b82f6", fg: "#ffffff", w: 512, h: 640, size: 52 }), side: THREE.DoubleSide });
   const mgmtDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), mgmtDoorMat);
   mgmtDoor.position.set(mgmtX, 1.5, mgmtZ + mgmtD / 2 + 0.02);
   scene.add(mgmtDoor);
-  const mgmtDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("مدیریت", { bg: "#1d4ed8", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
+  const mgmtDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("مدیریت", { bg: "#1d4ed8", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
   const mgmtDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.5), mgmtDoorSignMat);
   mgmtDoorSign.position.set(mgmtX, 3.4, mgmtZ + mgmtD / 2 + 0.02);
   scene.add(mgmtDoorSign);
@@ -158,12 +158,14 @@ export default function buildCity(scene) {
   gameRoof.position.set(gameX, gameH + 0.25, gameZ);
   scene.add(gameRoof);
 
-  const gameDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به بازی", { bg: "#14b8a6", fg: "#ffffff", w: 512, h: 640, size: 52 }) });
+  const gameDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به بازی", { bg: "#14b8a6", fg: "#ffffff", w: 512, h: 640, size: 52 }), side: THREE.DoubleSide });
   const gameDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), gameDoorMat);
+  gameDoor.rotation.y = Math.PI;
   gameDoor.position.set(gameX, 1.5, gameZ - gameD / 2 - 0.02);
   scene.add(gameDoor);
-  const gameDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("بازی", { bg: "#0f766e", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
+  const gameDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("بازی", { bg: "#0f766e", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
   const gameDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.5), gameDoorSignMat);
+  gameDoorSign.rotation.y = Math.PI;
   gameDoorSign.position.set(gameX, 3.4, gameZ - gameD / 2 - 0.02);
   scene.add(gameDoorSign);
   colliders.push({
@@ -192,14 +194,14 @@ export default function buildCity(scene) {
   );
   schRoof.position.set(schX, schH + 0.25, schZ);
   scene.add(schRoof);
-  const schDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به شاد", { bg: "#60a5fa", fg: "#ffffff", w: 512, h: 640, size: 52 }) });
+  const schDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به شاد", { bg: "#60a5fa", fg: "#ffffff", w: 512, h: 640, size: 52 }), side: THREE.DoubleSide });
   const schDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), schDoorMat);
-  schDoor.rotation.y = Math.PI / 2;
+  schDoor.rotation.y = -Math.PI / 2;
   schDoor.position.set(schX - schW / 2 - 0.02, 1.5, schZ);
   scene.add(schDoor);
-  const schDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("شاد", { bg: "#2563eb", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
+  const schDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("شاد", { bg: "#2563eb", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
   const schDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.5), schDoorSignMat);
-  schDoorSign.rotation.y = Math.PI / 2;
+  schDoorSign.rotation.y = -Math.PI / 2;
   schDoorSign.position.set(schX - schW / 2 - 0.02, 3.4, schZ);
   scene.add(schDoorSign);
   colliders.push({
@@ -228,14 +230,14 @@ export default function buildCity(scene) {
   );
   musRoof.position.set(musX, musH + 0.25, musZ);
   scene.add(musRoof);
-  const musDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به موزه", { bg: "#f59e0b", fg: "#ffffff", w: 512, h: 640, size: 52 }) });
+  const musDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به موزه", { bg: "#f59e0b", fg: "#ffffff", w: 512, h: 640, size: 52 }), side: THREE.DoubleSide });
   const musDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), musDoorMat);
-  musDoor.rotation.y = -Math.PI / 2;
+  musDoor.rotation.y = Math.PI / 2;
   musDoor.position.set(musX + musW / 2 + 0.02, 1.5, musZ);
   scene.add(musDoor);
-  const musDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("موزه", { bg: "#92400e", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
+  const musDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("موزه", { bg: "#92400e", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
   const musDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.5), musDoorSignMat);
-  musDoorSign.rotation.y = -Math.PI / 2;
+  musDoorSign.rotation.y = Math.PI / 2;
   musDoorSign.position.set(musX + musW / 2 + 0.02, 3.4, musZ);
   scene.add(musDoorSign);
   colliders.push({
@@ -270,14 +272,14 @@ export default function buildCity(scene) {
   });
   const shopZone = { x: shpX - shpW / 2 - 5, z: shpZ, r: 7 };
 
-  const shpDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به فروشگاه", { bg: "#f472b6", fg: "#ffffff", w: 512, h: 640, size: 48 }) });
+  const shpDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به فروشگاه", { bg: "#f472b6", fg: "#ffffff", w: 512, h: 640, size: 48 }), side: THREE.DoubleSide });
   const shpDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), shpDoorMat);
-  shpDoor.rotation.y = Math.PI / 2;
+  shpDoor.rotation.y = -Math.PI / 2;
   shpDoor.position.set(shpX - shpW / 2 - 0.02, 1.5, shpZ);
   scene.add(shpDoor);
-  const shpDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("فروشگاه", { bg: "#be185d", fg: "#ffffff", w: 256, h: 64, size: 28 }) });
+  const shpDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("فروشگاه", { bg: "#be185d", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
   const shpDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.5), shpDoorSignMat);
-  shpDoorSign.rotation.y = Math.PI / 2;
+  shpDoorSign.rotation.y = -Math.PI / 2;
   shpDoorSign.position.set(shpX - shpW / 2 - 0.02, 3.4, shpZ);
   scene.add(shpDoorSign);
 
