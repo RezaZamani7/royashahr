@@ -323,7 +323,7 @@ export default function WebLobby() {
   };
 
   const openSchool = () => {
-    setBrowser({ title: "ساختمان مدرسه (شاد)", src: "https://web.shad.ir/" });
+    setUnderConstruction({ title: "ساختمان مدرسه" });
   };
 
   const openMuseum = () => {
@@ -399,9 +399,9 @@ export default function WebLobby() {
           )}
           {action.type === "school" && (
             <>
-              <p className="world-action-title">ساختمان مدرسه (شاد)</p>
+              <p className="world-action-title">ساختمان مدرسه</p>
               <button className="world-enter-btn" onClick={openSchool}>
-                ورود به سامانه شاد
+                ورود به ساختمان
               </button>
             </>
           )}

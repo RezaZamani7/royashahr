@@ -242,7 +242,7 @@ export default function buildCity(scene) {
   });
   const gamesZone = { x: gameX, z: gameZ - gameD / 2 - 5, r: 6 };
 
-  // ---------- ساختمان مدرسه (شاد) ----------
+  // ---------- ساختمان مدرسه ----------
   const schX = 55;
   const schZ = 55;
   const schW = 10;
@@ -262,12 +262,12 @@ export default function buildCity(scene) {
   );
   schRoof.position.set(schX, schH + 0.25, schZ);
   scene.add(schRoof);
-  const schDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به شاد", { bg: "#60a5fa", fg: "#ffffff", w: 512, h: 640, size: 52 }), side: THREE.DoubleSide });
+  const schDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("ورود به مدرسه", { bg: "#60a5fa", fg: "#ffffff", w: 512, h: 640, size: 52 }), side: THREE.DoubleSide });
   const schDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), schDoorMat);
   schDoor.rotation.y = -Math.PI / 2;
   schDoor.position.set(schX - schW / 2 - 0.02, 1.5, schZ);
   scene.add(schDoor);
-  const schDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("شاد", { bg: "#2563eb", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
+  const schDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("مدرسه", { bg: "#2563eb", fg: "#ffffff", w: 256, h: 64, size: 28 }), side: THREE.DoubleSide });
   const schDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(4, 0.5), schDoorSignMat);
   schDoorSign.rotation.y = -Math.PI / 2;
   schDoorSign.position.set(schX - schW / 2 - 0.02, 3.4, schZ);
