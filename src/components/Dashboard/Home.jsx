@@ -3,6 +3,7 @@ import { useGame } from "../../context/GameContext";
 import { useNavigate } from "react-router-dom";
 import AdBanner from "../Ads/AdBanner";
 import BrowserModal from "../Webworld/BrowserModal";
+import UnderConstruction from "../UnderConstruction";
 
 // ساختمان‌های قابل انتخاب از صفحه اصلی:
 //  - ساختمان بازی: به صفحه مجموعه بازی هدایت می‌شود
@@ -40,15 +41,31 @@ const BUILDINGS = [
     type: "url",
     src: "https://www.digikala.com/",
   },
+  {
+    id: "realEstate",
+    icon: "🏦",
+    title: "سازمان املاک و اسناد رویاشهر",
+    desc: "ثبت و استعلام املاک",
+    type: "construction",
+  },
+  {
+    id: "exchange",
+    icon: "💱",
+    title: "مرکز مبادله ارز",
+    desc: "مبادله ارز و سکه",
+    type: "construction",
+  },
 ];
 
 export default function Home() {
   const { profile } = useGame();
   const navigate = useNavigate();
   const [browser, setBrowser] = useState(null);
+  const [underConstruction, setUnderConstruction] = useState(null);
 
   const openBuilding = (b) => {
     if (b.type === "route") navigate(b.path);
+    else if (b.type === "construction") setUnderConstruction({ title: b.title });
     else if (b.type === "url") {
       // سایت‌های خارجی در پنجره‌ی داخلی (iframe) باز می‌شوند.
       const frameBlockers = [];
@@ -119,6 +136,14 @@ export default function Home() {
           src={browser.src}
           backLabel="بستن"
           onClose={() => setBrowser(null)}
+        />
+      )}
+
+      {underConstruction && (
+        <UnderConstruction
+          title={underConstruction.title}
+          onClose={() => setUnderConstruction(null)}
+          backLabel="بستن"
         />
       )}
     </div>

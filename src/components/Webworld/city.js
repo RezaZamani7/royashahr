@@ -139,6 +139,74 @@ export default function buildCity(scene) {
   mgmtDoorSign.position.set(mgmtX, 3.4, mgmtZ + mgmtD / 2 + 0.02);
   scene.add(mgmtDoorSign);
 
+  // ---------- سازمان املاک و اسناد رویاشهر ----------
+  const emlX = -20;
+  const emlZ = -45;
+  const emlW = 10;
+  const emlD = 8;
+  const emlH = 4;
+  const emlBody = new THREE.Mesh(
+    new THREE.BoxGeometry(emlW, emlH, emlD),
+    new THREE.MeshLambertMaterial({ color: 0x475569 })
+  );
+  emlBody.position.set(emlX, emlH / 2, emlZ);
+  emlBody.castShadow = true;
+  emlBody.receiveShadow = true;
+  scene.add(emlBody);
+  const emlRoof = new THREE.Mesh(
+    new THREE.BoxGeometry(emlW + 0.6, 0.5, emlD + 0.6),
+    new THREE.MeshLambertMaterial({ color: 0x334155 })
+  );
+  emlRoof.position.set(emlX, emlH + 0.25, emlZ);
+  scene.add(emlRoof);
+  const emlDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("سازمان املاک", { bg: "#64748b", fg: "#ffffff", w: 512, h: 640, size: 46 }), side: THREE.DoubleSide });
+  const emlDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), emlDoorMat);
+  emlDoor.position.set(emlX, 1.5, emlZ + emlD / 2 + 0.02);
+  scene.add(emlDoor);
+  const emlDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("سازمان املاک و اسناد", { bg: "#475569", fg: "#ffffff", w: 512, h: 128, size: 34 }), side: THREE.DoubleSide });
+  const emlDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.8), emlDoorSignMat);
+  emlDoorSign.position.set(emlX, 3.4, emlZ + emlD / 2 + 0.02);
+  scene.add(emlDoorSign);
+  colliders.push({
+    min: { x: emlX - emlW / 2, z: emlZ - emlD / 2 },
+    max: { x: emlX + emlW / 2, z: emlZ + emlD / 2 },
+  });
+  const realEstateZone = { x: emlX, z: emlZ + emlD / 2 + 5, r: 6 };
+
+  // ---------- مرکز مبادله ارز ----------
+  const arzX = 20;
+  const arzZ = -45;
+  const arzW = 10;
+  const arzD = 8;
+  const arzH = 4;
+  const arzBody = new THREE.Mesh(
+    new THREE.BoxGeometry(arzW, arzH, arzD),
+    new THREE.MeshLambertMaterial({ color: 0xb45309 })
+  );
+  arzBody.position.set(arzX, arzH / 2, arzZ);
+  arzBody.castShadow = true;
+  arzBody.receiveShadow = true;
+  scene.add(arzBody);
+  const arzRoof = new THREE.Mesh(
+    new THREE.BoxGeometry(arzW + 0.6, 0.5, arzD + 0.6),
+    new THREE.MeshLambertMaterial({ color: 0x92400e })
+  );
+  arzRoof.position.set(arzX, arzH + 0.25, arzZ);
+  scene.add(arzRoof);
+  const arzDoorMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("مرکز مبادله ارز", { bg: "#f59e0b", fg: "#ffffff", w: 512, h: 640, size: 46 }), side: THREE.DoubleSide });
+  const arzDoor = new THREE.Mesh(new THREE.PlaneGeometry(4, 3), arzDoorMat);
+  arzDoor.position.set(arzX, 1.5, arzZ + arzD / 2 + 0.02);
+  scene.add(arzDoor);
+  const arzDoorSignMat = new THREE.MeshBasicMaterial({ map: makeTextTexture("مرکز مبادله ارز", { bg: "#b45309", fg: "#ffffff", w: 512, h: 128, size: 34 }), side: THREE.DoubleSide });
+  const arzDoorSign = new THREE.Mesh(new THREE.PlaneGeometry(5, 0.8), arzDoorSignMat);
+  arzDoorSign.position.set(arzX, 3.4, arzZ + arzD / 2 + 0.02);
+  scene.add(arzDoorSign);
+  colliders.push({
+    min: { x: arzX - arzW / 2, z: arzZ - arzD / 2 },
+    max: { x: arzX + arzW / 2, z: arzZ + arzD / 2 },
+  });
+  const exchangeZone = { x: arzX, z: arzZ + arzD / 2 + 5, r: 6 };
+
   // ---------- ساختمان بازی ----------
   const gameX = 0;
   const gameZ = 45;
@@ -298,5 +366,5 @@ export default function buildCity(scene) {
     scene.add(t, lf);
   }
 
-  return { colliders, managementZone, gamesZone, schoolZone, museumZone, shopZone, spawn: { x: 0, z: 22 } };
+  return { colliders, managementZone, gamesZone, schoolZone, museumZone, shopZone, realEstateZone, exchangeZone, spawn: { x: 0, z: 22 } };
 }

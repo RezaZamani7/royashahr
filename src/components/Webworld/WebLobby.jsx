@@ -7,6 +7,7 @@ import { loadAvatarWithAnimation, AVAATARS } from "./avatars";
 import Joystick from "./Joystick";
 import AvatarPicker from "./AvatarPicker";
 import BrowserModal from "./BrowserModal";
+import UnderConstruction from "../UnderConstruction";
 
 const SPEED = 10;
 // کنترل سبک تانکی/سوم‌شخص (شبیه GTA)
@@ -30,6 +31,7 @@ export default function WebLobby() {
   const [camMode, setCamMode] = useState("third");
   const [action, setAction] = useState(null); // {type:'management'} | {type:'games'}
   const [browser, setBrowser] = useState(null); // {title, src}
+  const [underConstruction, setUnderConstruction] = useState(null); // {title} | null
   const [showPicker, setShowPicker] = useState(false);
   const [avatarId, setAvatarId] = useState(profile?.avatar || AVAATARS[0].id);
 
@@ -257,6 +259,10 @@ export default function WebLobby() {
         newAction = { type: "museum" };
       } else if (Math.hypot(px - city.shopZone.x, pz - city.shopZone.z) < city.shopZone.r) {
         newAction = { type: "shop" };
+      } else if (Math.hypot(px - city.realEstateZone.x, pz - city.realEstateZone.z) < city.realEstateZone.r) {
+        newAction = { type: "realEstate" };
+      } else if (Math.hypot(px - city.exchangeZone.x, pz - city.exchangeZone.z) < city.exchangeZone.r) {
+        newAction = { type: "exchange" };
       }
       if ((newAction?.type) !== (actionRef.current?.type)) {
         actionRef.current = newAction;
@@ -331,6 +337,10 @@ export default function WebLobby() {
     setBrowser({ title: "ساختمان خرید", src: "https://www.digikala.com/" });
   };
 
+  const openUnderConstruction = (title) => {
+    setUnderConstruction({ title });
+  };
+
   return (
     <div className="weblobby">
       <div className="world-canvas" ref={containerRef} />
@@ -361,7 +371,7 @@ export default function WebLobby() {
       </div>
 
       {/* نشانگر تعامل: دربavorite ساختمان */}
-      {action && !browser && (
+      {action && !browser && !underConstruction && (
         <div className="world-action">
           {action.type === "management" && (
             <>
@@ -411,6 +421,22 @@ export default function WebLobby() {
               </button>
             </>
           )}
+          {action.type === "realEstate" && (
+            <>
+              <p className="world-action-title">سازمان املاک و اسناد رویاشهر</p>
+              <button className="world-enter-btn" onClick={() => openUnderConstruction("سازمان املاک و اسناد رویاشهر")}>
+                ورود به ساختمان
+              </button>
+            </>
+          )}
+          {action.type === "exchange" && (
+            <>
+              <p className="world-action-title">مرکز مبادله ارز</p>
+              <button className="world-enter-btn" onClick={() => openUnderConstruction("مرکز مبادله ارز")}>
+                ورود به ساختمان
+              </button>
+            </>
+          )}
         </div>
       )}
 
@@ -423,6 +449,14 @@ export default function WebLobby() {
       )}
 
       {browser && <BrowserModal title={browser.title} src={browser.src} onClose={() => setBrowser(null)} />}
+
+      {underConstruction && (
+        <UnderConstruction
+          title={underConstruction.title}
+          onClose={() => setUnderConstruction(null)}
+          backLabel="بازگشت به شهر"
+        />
+      )}
     </div>
   );
 }

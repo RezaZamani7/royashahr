@@ -1670,6 +1670,37 @@ body {
   background: var(--bg);
 }
 
+/* ===== صفحه «در دست ساخت» ===== */
+.under-construction-modal {
+  width: min(480px, 100%);
+  height: auto;
+  min-height: 320px;
+}
+.under-construction-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+.under-construction-icon {
+  font-size: 5rem;
+  line-height: 1;
+}
+.under-construction-content h3 {
+  color: #fff;
+  font-size: 1.6rem;
+  margin: 0;
+}
+.under-construction-content p {
+  color: var(--text-light);
+  font-size: 1rem;
+  margin: 0;
+}
+
 /* ===== انتخاب آواتار ===== */
 .avatar-picker-modal {
   max-width: 720px;
